@@ -1,0 +1,35 @@
+{% extends "index.html" %}
+
+{% block form %}
+    <div id="options">
+        <ul class="nav nav-pills" style="margin-bottom:10px;">
+            <li class="nav-item">
+                <a class="nav-link" aria-current="page" href="{{ url_for('index')}}">Confab</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="{{ url_for('rdkit') }}">RDKit</a>
+            </li>
+        </ul>
+        <label style="text-align: right;">Upload your molecule (PDB format):</label>
+        <input type="file" id="pdb" name="pdb_molecule"><br>
+        <label style="text-align: right;">or, provide a canonical SMILES:</label>
+        <input type="text" id="smiles" name="smiles_molecule"><br>
+        <label style="text-align: right;">Number of conformers:</label>
+        <input type="number" id="confs" name="no_conformers" max=500 min=50 value=100 step=50><br>
+    </div>
+    <br>
+    <div class="msg"></div>
+    <input class="btn btn-primary" id="submit-button" type="submit" name="submit_btn" value="Generate">
+{% endblock %}
+{% block submitFinished %}
+    {% if mol %}
+        <script type="text/javascript">
+            var submitBtn = document.querySelector("#submit-button");
+            submitBtn.remove();
+        </script>
+        <a href='{{ url_for("serve_pdbs", method=method, mol=mol) }}'>
+            <button type="button" class="btn btn-success">Download</button></a>
+        <a href="{{ url_for('reset_rdkit', mol=mol) }}">
+            <button type="button" class="btn btn-warning">Reset</button></a>
+    {% endif %}
+{% endblock %}
