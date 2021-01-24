@@ -33,21 +33,6 @@ def internal_error(exception):
         f.write(traceback.format_exc())
 
 
-@app.route("/reset/<method>/<mol>")
-def reset(method, mol):
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
-        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
-        if method == "confab":
-            return redirect(url_for("confab_page"))
-        else:
-            return redirect(url_for("rdkit"))
-    else:
-        if method == "confab":
-            return redirect(url_for("confab_page"))
-        else:
-            return redirect(url_for("rdkit"))
-
-
 @app.route("/")
 def index():
     return redirect(url_for("confab_page"))
@@ -61,6 +46,21 @@ def confab_page():
 @app.route("/rdkit")
 def rdkit():
     return render_template("rdkit.html")
+
+
+@app.route("/reset/<method>/<mol>")
+def reset(method, mol):
+    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
+        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
+        if method == "confab":
+            return redirect(url_for("confab_page"))
+        else:
+            return redirect(url_for("rdkit"))
+    else:
+        if method == "confab":
+            return redirect(url_for("confab_page"))
+        else:
+            return redirect(url_for("rdkit"))
 
 
 @app.route("/<method>/<mol>") 
