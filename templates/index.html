@@ -38,31 +38,31 @@
                                 <div class="card card-body" style="width:500px;height:300px;margin:auto;margin-top:10px;">
                                     <input type="text" id="email" name="email" placeholder="Email Address" style="margin-bottom: 10px;font-size:14px;">
                                     <label style="text-align:left;font-size:14px;">Comment:</label>
-                                    <textarea style="margin-bottom:10px;height:400px;font-size:14px;"> </textarea>
+                                    <textarea id="msg" name="message" style="margin-bottom:10px;height:400px;font-size:14px;"> </textarea>
                                     <div><input class="btn btn-primary" type="submit" id="send" name="send-btn" value="Send"></div> 
                                 </div>
                             </form>
                         </div>
                     </ul><br>
                 </div>
-                <!-- <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;">
+                <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;">
                     <video muted loop autoplay id="metho" width="540px" height="390px" style="margin-left:-10px;">
                         <source src="static/metho.mp4" type="video/mp4">
                     </video>
                     <video muted loop autoplay id="confs" width="540px" height="400px" style="margin-left:-100px;">
                         <source src="static/confs.mp4" type="video/mp4">
                     </video>
-                </div> -->
+                </div>
             </header>
             <form id="submission-form" method="post" enctype="multipart/form-data">
                 {% block form %}
                 <div id="options">
                     <ul class="nav nav-pills" style="margin-bottom:10px;">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('confab_page') }}">Confab</a>
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('rdkit') }}">RDKit</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ url_for('rdkit') }}">RDKit</a>
+                            <a class="nav-link" href="{{ url_for('confab_page') }}">Confab</a>
                         </li>
                     </ul>
                     <label style="text-align: right;">Upload your molecule (PDB format):</label>
@@ -71,12 +71,6 @@
                     <input type="text" id="smiles" name="smiles_molecule"><br>
                     <label style="text-align: right;">Number of conformers:</label>
                     <input type="number" id="confs" name="no_conformers" max=500 min=50 value=100 step=50><br>
-                    <label style="text-align: right;">Force field:</label> 
-                    <select class="custom-select" id="ff" name="force_field" style="font-weight:500;">
-                        <option selected="MMFF94" value="mmff94">MMFF94</option>
-                        <option value="gaff">AMBER</option>
-                        <option value="uff">UFF</option>
-                    </select>
                 </div>
                 <br>
                 <div class="msg"></div>

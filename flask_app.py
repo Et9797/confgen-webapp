@@ -16,16 +16,25 @@ from rdkit.Chem import AllChem
 import conf_gen_rdkit
 import pdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
-# from flask_mail import Mail, Message
+from flask_mail import Mail, Message
+from config import mail_username, mail_password
+
+# logging.basicConfig(level=logging.DEBUG)
 
 BASE_DIR = '/home/et/personal_projects/rdkit-obabel-confgen/'
 MOLECULE_UPLOADS = '/home/et/personal_projects/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
-#change to '/var/www/html/obabel_confgen/MOLECULE_UPLOADS/'
+#change to '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
+
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
 app.config["MOLECULE_UPLOADS"] = MOLECULE_UPLOADS
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #don't cache the files
-
+app.config["MAIL_SERVER"] = "smtp-mail.outlook.com"
+app.config["MAIL_PORT"] = 587
+app.config["MAIL_USE_TLS"] = True
+app.config["MAIL_USE_SSL"] = False
+app.config["MAIL_USERNAME"] = mail_username
+app.config["MAIL_PASSWORD"] = mail_password
 
 mail = Mail(app)
 
@@ -39,22 +48,27 @@ def internal_error(exception):
 @app.route("/contact", methods=["POST","GET"])
 def contact():
     if request.method == "POST":
-        return redirect(url_for("confab_page")) 
-
+        email = request.form["email"]
+        message = request.form["message"].strip()
+        msg = Message(subject="Conformer Webapp", body=f"Email: {email} \n \n{message}",
+        sender=mail_username, recipients=[mail_username])
+        mail.send(msg)
+        return redirect(url_for("rdkit")) 
+    
 
 @app.route("/")
 def index():
-    return redirect(url_for("confab_page"))
-
-
-@app.route("/confab")
-def confab_page():
-    return render_template("index.html")
+    return redirect(url_for("rdkit"))
 
 
 @app.route("/rdkit")
 def rdkit():
-    return render_template("rdkit.html")
+    return render_template("index.html")
+
+
+@app.route("/confab")
+def confab_page():
+    return render_template("confab.html")
 
 
 @app.route("/reset/<method>/<mol>")
@@ -131,13 +145,13 @@ def form_handler(method):
                 confab.write_conformers(mole, conf_sample)
             else:
                 confab.write_conformers(mole, range(mole.NumConformers()))
-            return render_template("index.html", method="confab", mol=smiles_no_special_chars[0:10])
+            return render_template("confab.html", method="confab", mol=smiles_no_special_chars[0:10])
         else:
             conformers = conf_gen_rdkit.gen_conformers(smiles, no_conformers)
             conf_gen_rdkit.write_confs_to_pdb(conformers)
-            return render_template("rdkit.html", method="rdkit", mol=smiles_no_special_chars[0:10])
+            return render_template("index.html", method="rdkit", mol=smiles_no_special_chars[0:10])
         
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run()
 

@@ -4,10 +4,10 @@
     <div id="options">
         <ul class="nav nav-pills" style="margin-bottom:10px;">
             <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="{{ url_for('confab_page') }}">Confab</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('rdkit') }}">RDKit</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link active" href="{{ url_for('rdkit') }}">RDKit</a>
+                <a class="nav-link active" href="{{ url_for('confab_page') }}">Confab</a>
             </li>
         </ul>
         <label style="text-align: right;">Upload your molecule (PDB format):</label>
@@ -16,6 +16,12 @@
         <input type="text" id="smiles" name="smiles_molecule"><br>
         <label style="text-align: right;">Number of conformers:</label>
         <input type="number" id="confs" name="no_conformers" max=500 min=50 value=100 step=50><br>
+        <label style="text-align: right;">Force field:</label> 
+        <select class="custom-select" id="ff" name="force_field" style="font-weight:500;">
+            <option selected="MMFF94" value="mmff94">MMFF94</option>
+            <option value="gaff">AMBER</option>
+            <option value="uff">UFF</option>
+        </select>
     </div>
     <br>
     <div class="msg"></div>
