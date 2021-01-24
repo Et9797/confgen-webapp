@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 You tried to access the file "pdb_molecule" in the request.files dictionary but it does not exist.  The mimetype for the request is "application/x-www-form-urlencoded" instead of "multipart/form-data" which means that no file contents were transmitted.  To fix this error you should provide enctype="multipart/form-data" in your form.
 
 The browser instead transmitted some file names. This was submitted: ""
@@ -94,3 +95,5 @@ Traceback (most recent call last):
 flask.debughelpers.DebugFilesKeyError: You tried to access the file "pdb_molecule" in the request.files dictionary but it does not exist.  The mimetype for the request is "application/x-www-form-urlencoded" instead of "multipart/form-data" which means that no file contents were transmitted.  To fix this error you should provide enctype="multipart/form-data" in your form.
 
 The browser instead transmitted some file names. This was submitted: ""
+=======
+>>>>>>> c915717735655db297344124c1b2db5cae160044

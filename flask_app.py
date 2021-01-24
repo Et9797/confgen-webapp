@@ -17,8 +17,8 @@ import conf_gen_rdkit
 import pdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
 
-BASE_DIR = '/home/et/personal_projects/rdkit-obabel-confgen/'
-MOLECULE_UPLOADS = '/home/et/personal_projects/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
+BASE_DIR = '/var/www/html/rdkit-obabel-confgen/'
+MOLECULE_UPLOADS = '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
 #change to '/var/www/html/obabel_confgen/MOLECULE_UPLOADS/'
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
@@ -134,5 +134,5 @@ def form_handler(method):
         
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run()
 
