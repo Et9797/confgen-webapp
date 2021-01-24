@@ -4,7 +4,7 @@
     <div id="options">
         <ul class="nav nav-pills" style="margin-bottom:10px;">
             <li class="nav-item">
-                <a class="nav-link" aria-current="page" href="{{ url_for('index')}}">Confab</a>
+                <a class="nav-link" aria-current="page" href="{{ url_for('confab_page') }}">Confab</a>
             </li>
             <li class="nav-item">
                 <a class="nav-link active" href="{{ url_for('rdkit') }}">RDKit</a>
@@ -20,16 +20,4 @@
     <br>
     <div class="msg"></div>
     <input class="btn btn-primary" id="submit-button" type="submit" name="submit_btn" value="Generate">
-{% endblock %}
-{% block submitFinished %}
-    {% if mol %}
-        <script type="text/javascript">
-            var submitBtn = document.querySelector("#submit-button");
-            submitBtn.remove();
-        </script>
-        <a href='{{ url_for("serve_pdbs", method=method, mol=mol) }}'>
-            <button type="button" class="btn btn-success">Download</button></a>
-        <a href="{{ url_for('reset_rdkit', mol=mol) }}">
-            <button type="button" class="btn btn-warning">Reset</button></a>
-    {% endif %}
 {% endblock %}

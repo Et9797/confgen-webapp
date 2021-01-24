@@ -3,7 +3,7 @@
 <head>
     <title>Free Ligand Conformer Generator</title>
     <meta charset="utf-8">
-    <meta name="description" content="Small molecule (ligand) conformer generation with OpenBabel">
+    <meta name="description" content="Small molecule (ligand) conformer generation with OpenBabel and Rdkit">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="static/style.css">
@@ -50,15 +50,13 @@
                         <source src="static/confs.mp4" type="video/mp4">
                     </video>
                 </div>
-                
-                <!-- <img src="static/testx.mpg" id="conformer_image" alt="conformers" style="width:50%;height:auto;"> -->
             </header>
             <form id="submission-form" method="post" enctype="multipart/form-data">
                 {% block form %}
                 <div id="options">
                     <ul class="nav nav-pills" style="margin-bottom:10px;">
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('index')}}">Confab</a>
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('confab_page') }}">Confab</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ url_for('rdkit') }}">RDKit</a>
@@ -85,18 +83,16 @@
             <div class="spinner-border text-primary" id="spinner" style="width:2.5rem;height:2.5rem;" role="status">
                 <span class="sr-only">Loading...</span>
             </div>
-            {% block submitFinished %}
-                {% if mol %}
-                    <script type="text/javascript">
-                        var submitBtn = document.querySelector("#submit-button");
-                        submitBtn.remove();
-                    </script>
-                    <a href='{{ url_for("serve_pdbs", method=method, mol=mol) }}'>
-                        <button type="button" class="btn btn-success">Download</button></a>
-                    <a href="{{ url_for('reset', mol=mol) }}">
-                        <button type="button" class="btn btn-warning">Reset</button></a>
-                {% endif %}
-            {% endblock %}
+            {% if mol %}
+                <script type="text/javascript">
+                    var submitBtn = document.querySelector("#submit-button");
+                    submitBtn.remove();
+                </script>
+                <a href='{{ url_for("serve_pdbs", method=method, mol=mol) }}'>
+                    <button type="button" class="btn btn-success">Download</button></a>
+                <a href="{{ url_for('reset', method=method, mol=mol) }}">
+                    <button type="button" class="btn btn-warning">Reset</button></a>
+            {% endif %}
         </div>
         <footer id="main-footer">
             <p>Made with Flask & Bootstrap.</p>
