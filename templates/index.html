@@ -34,14 +34,14 @@
                             </div>
                         </div>
                         <div class="collapse" id="collapseContact">
-                            <form id='contact-form' method="post">
+                            <form id='contact-form' method="post" action="{{ url_for('contact') }}">
                                 <div class="card card-body" style="width:500px;height:300px;margin:auto;margin-top:10px;">
                                     <input type="text" id="email" name="email" placeholder="Email Address" style="margin-bottom: 10px;font-size:14px;">
                                     <label style="text-align:left;font-size:14px;">Comment:</label>
                                     <textarea style="margin-bottom:10px;height:400px;font-size:14px;"> </textarea>
                                     <div><input class="btn btn-primary" type="submit" id="send" name="send-btn" value="Send"></div> 
                                 </div>
-                            </for>
+                            </form>
                         </div>
                     </ul><br>
                 </div>

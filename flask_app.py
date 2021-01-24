@@ -16,9 +16,10 @@ from rdkit.Chem import AllChem
 import conf_gen_rdkit
 import pdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
+# from flask_mail import Mail, Message
 
-BASE_DIR = '/var/www/html/rdkit-obabel-confgen/'
-MOLECULE_UPLOADS = '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
+BASE_DIR = '/home/et/personal_projects/rdkit-obabel-confgen/'
+MOLECULE_UPLOADS = '/home/et/personal_projects/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
 #change to '/var/www/html/obabel_confgen/MOLECULE_UPLOADS/'
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
@@ -26,16 +27,20 @@ app.config["MOLECULE_UPLOADS"] = MOLECULE_UPLOADS
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #don't cache the files
 
 
+mail = Mail(app)
+
 @app.errorhandler(Exception)
 def internal_error(exception):
     with open(os.path.join(app.config["BASE_DIR"], "log.txt"), "a") as f:
         f.write(str(exception) + "\n")
         f.write(traceback.format_exc())
 
-@app.route("/", methods=["POST","GET"])
+
+@app.route("/contact", methods=["POST","GET"])
 def contact():
     if request.method == "POST":
-        return "<h1>HELLO</h1>"
+        return redirect(url_for("confab_page")) 
+
 
 @app.route("/")
 def index():
@@ -134,5 +139,5 @@ def form_handler(method):
         
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", debug=True)
 
