@@ -32,6 +32,10 @@ def internal_error(exception):
         f.write(str(exception) + "\n")
         f.write(traceback.format_exc())
 
+@app.route("/", methods=["POST","GET"])
+def contact():
+    if request.method == "POST":
+        return "<h1>HELLO</h1>"
 
 @app.route("/")
 def index():

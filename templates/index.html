@@ -34,22 +34,25 @@
                             </div>
                         </div>
                         <div class="collapse" id="collapseContact">
-                            <div class="card card-body" style="width:500px;height:300px;margin:auto;margin-top:10px;">
-                                <label style="text-align:left;">Comment:</label>
-                                <textarea style="margin-bottom:10px;height:400px;font-size:14px;"> </textarea>
-                                <div><button class="btn btn-primary">Send</button> </div>
-                            </div>
+                            <form id='contact-form' method="post">
+                                <div class="card card-body" style="width:500px;height:300px;margin:auto;margin-top:10px;">
+                                    <input type="text" id="email" name="email" placeholder="Email Address" style="margin-bottom: 10px;font-size:14px;">
+                                    <label style="text-align:left;font-size:14px;">Comment:</label>
+                                    <textarea style="margin-bottom:10px;height:400px;font-size:14px;"> </textarea>
+                                    <div><input class="btn btn-primary" type="submit" id="send" name="send-btn" value="Send"></div> 
+                                </div>
+                            </for>
                         </div>
                     </ul><br>
                 </div>
-                <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;">
+                <!-- <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;">
                     <video muted loop autoplay id="metho" width="540px" height="390px" style="margin-left:-10px;">
                         <source src="static/metho.mp4" type="video/mp4">
                     </video>
                     <video muted loop autoplay id="confs" width="540px" height="400px" style="margin-left:-100px;">
                         <source src="static/confs.mp4" type="video/mp4">
                     </video>
-                </div>
+                </div> -->
             </header>
             <form id="submission-form" method="post" enctype="multipart/form-data">
                 {% block form %}
