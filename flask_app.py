@@ -17,8 +17,8 @@ import conf_gen_rdkit
 import pdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
 
-BASE_DIR = '/home/et/personal_projects/rdkit-obabel-confgen/'
-MOLECULE_UPLOADS = '/home/et/personal_projects/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
+BASE_DIR = '/var/www/html/rdkit-obabel-confgen/'
+MOLECULE_UPLOADS = '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
 #change to '/var/www/html/obabel_confgen/MOLECULE_UPLOADS/'
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
@@ -31,21 +31,6 @@ def internal_error(exception):
     with open(os.path.join(app.config["BASE_DIR"], "log.txt"), "a") as f:
         f.write(str(exception) + "\n")
         f.write(traceback.format_exc())
-
-
-@app.route("/reset/<method>/<mol>")
-def reset(method, mol):
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
-        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
-        if method == "confab":
-            return redirect(url_for("confab_page"))
-        else:
-            return redirect(url_for("rdkit"))
-    else:
-        if method == "confab":
-            return redirect(url_for("confab_page"))
-        else:
-            return redirect(url_for("rdkit"))
 
 
 @app.route("/")
@@ -61,6 +46,21 @@ def confab_page():
 @app.route("/rdkit")
 def rdkit():
     return render_template("rdkit.html")
+
+
+@app.route("/reset/<method>/<mol>")
+def reset(method, mol):
+    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
+        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
+        if method == "confab":
+            return redirect(url_for("confab_page"))
+        else:
+            return redirect(url_for("rdkit"))
+    else:
+        if method == "confab":
+            return redirect(url_for("confab_page"))
+        else:
+            return redirect(url_for("rdkit"))
 
 
 @app.route("/<method>/<mol>") 
@@ -130,5 +130,5 @@ def form_handler(method):
         
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run()
 
