@@ -44,6 +44,13 @@ body {
     margin-right:10px;
 }
 
+.card-body {
+    padding-left:30px;
+    padding-right:30px;
+}
+
+
+
 /* Submission form */
 #submission-form {
     margin:auto;

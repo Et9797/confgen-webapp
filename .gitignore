@@ -3,3 +3,7 @@ mtx.pdb
 .does_not_work.py
 wsgi.py
 config.py
+error.log
+log.txt
+molecules.txt
+scheduler.sh

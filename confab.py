@@ -9,7 +9,7 @@ def generate_conformers(smiles, force_field):
     mole = mole.OBMol
     mole.SetChainsPerceived(True) #temp fix for github problem # 
     
-    ff = ob.OBForceField_FindType(force_field) #amber
+    ff = ob.OBForceField_FindType(force_field)
     ff.Setup(mole)
     ff.DiverseConfGen(0.5, 100000, 50.0, True)
     ff.GetConformers(mole)

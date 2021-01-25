@@ -5,12 +5,11 @@ from rdkit.Chem import AllChem
 def gen_conformers(smiles, no_conformers):
 
     """Generates conformers for (crystal) ligand"""
-
+    
     mol = Chem.MolFromSmiles(smiles)
     mol = Chem.AddHs(mol, addCoords=True)
-    conf_ids = AllChem.EmbedMultipleConfs(mol, no_conformers, clearConfs=True) #numThreads=0
+    conf_ids = AllChem.EmbedMultipleConfs(mol, no_conformers, numThreads=0, clearConfs=True) #numThreads=0
     num_of_confs=mol.GetNumConformers()
-    print(str(num_of_confs) + " conformers generated.")
     return mol, conf_ids
 
 

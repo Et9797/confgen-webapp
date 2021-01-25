@@ -8,6 +8,8 @@ import requests
 import logging
 import traceback
 import random
+import time
+import uuid
 from openbabel import openbabel as ob
 from openbabel import pybel
 import confab 
@@ -19,7 +21,7 @@ from flask import Flask, Response, render_template, request, redirect, url_for, 
 from flask_mail import Mail, Message
 from config import mail_username, mail_password
 
-# logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(filename="log.txt", level=logging.DEBUG, format='%(asctime)s %(message)s')
 
 BASE_DIR = '/home/et/personal_projects/rdkit-obabel-confgen/'
 MOLECULE_UPLOADS = '/home/et/personal_projects/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
@@ -40,9 +42,15 @@ mail = Mail(app)
 
 @app.errorhandler(Exception)
 def internal_error(exception):
-    with open(os.path.join(app.config["BASE_DIR"], "log.txt"), "a") as f:
-        f.write(str(exception) + "\n")
+    with open(os.path.join(app.config["BASE_DIR"], "error.log"), "a") as f:
+        f.write(time.strftime("%d/%m %H:%M:%S") + "\n")
+        exc_type, _ , _ = sys.exc_info()
         f.write(traceback.format_exc())
+        f.write(f"{exc_type.__name__}" + "\n \n")
+        if exc_type.__name__ == "ArgumentError":
+            exc_type.__name__= "SMILES Parse Error"
+    current_page = request.path.strip("/")
+    return render_template(f"{current_page}.html", err=str(exc_type.__name__))
 
 
 @app.route("/contact", methods=["POST","GET"])
@@ -59,11 +67,11 @@ def contact():
 @app.route("/")
 def index():
     return redirect(url_for("rdkit"))
-
+    
 
 @app.route("/rdkit")
 def rdkit():
-    return render_template("index.html")
+    return render_template("rdkit.html")
 
 
 @app.route("/confab")
@@ -71,10 +79,10 @@ def confab_page():
     return render_template("confab.html")
 
 
-@app.route("/reset/<method>/<mol>")
-def reset(method, mol):
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
-        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
+@app.route("/reset/<method>/<job_id>")
+def reset(method, job_id):
+    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
+        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
         if method == "confab":
             return redirect(url_for("confab_page"))
         else:
@@ -86,9 +94,9 @@ def reset(method, mol):
             return redirect(url_for("rdkit"))
 
 
-@app.route("/<method>/<mol>") 
-def serve_pdbs(method, mol): 
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], mol)):
+@app.route("/<method>/<job_id>") 
+def serve_pdbs(method, job_id): 
+    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
         zipfolder = zipfile.ZipFile("Conformers.zip", "w", zipfile.ZIP_STORED)
         for f in os.listdir():
             if f != "Conformers.zip":
@@ -100,7 +108,7 @@ def serve_pdbs(method, mol):
             zip_mem.seek(0)
         fo.close()
 
-        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], mol))
+        shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
 
         return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
         attachment_filename="Conformers.zip", cache_timeout=0)
@@ -114,29 +122,29 @@ def serve_pdbs(method, mol):
 @app.route("/<method>", methods=["POST", "GET"])
 def form_handler(method):
     if request.method == "POST":
+        unique_id = str(uuid.uuid4())
         if method == "confab":
             force_field = request.form["force_field"]
         smiles = request.form["smiles_molecule"]
         pdb_file = request.files["pdb_molecule"]
         no_conformers = int(request.form["no_conformers"])
-        pattern = re.compile('[^A-Za-z0-9]+')
+        with open(os.path.join(app.config["BASE_DIR"], "molecules.txt"), "a") as f:
+            f.write(time.strftime("%d/%m %H:%M:%S") + "\n")
+            f.write(f"\t \t Smiles: {smiles} \n")
+            f.write(f"\t \t PDB: {pdb_file.filename} \n")
+            f.write(f"\t \t N_conformers: {no_conformers} \n \n")
         if smiles:
-            smiles_no_special_chars = re.sub(pattern, "", smiles)
-            mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], smiles_no_special_chars[0:10])
+            mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], unique_id)
         else: #PDB was provided
             assert pdb_file.filename.split(".")[-1] == "pdb"
             pdb_temp_path = os.path.join(app.config["MOLECULE_UPLOADS"], pdb_file.filename)
             pdb_file.save(pdb_temp_path)
             smiles = pdbToSmileConverter.pdb_to_smiles(pdb_temp_path)
-            smiles_no_special_chars = re.sub(pattern, "", smiles)
-            mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], smiles_no_special_chars[0:10])
+            mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], unique_id)
             os.remove(pdb_temp_path)
             
-        if os.path.exists(mol_path):
-            shutil.rmtree(mol_path)
         os.mkdir(mol_path)
         os.chdir(mol_path)
-        print(method)
 
         if method == "confab":
             mole = confab.generate_conformers(smiles, force_field)
@@ -145,13 +153,13 @@ def form_handler(method):
                 confab.write_conformers(mole, conf_sample)
             else:
                 confab.write_conformers(mole, range(mole.NumConformers()))
-            return render_template("confab.html", method="confab", mol=smiles_no_special_chars[0:10])
+            return render_template("confab.html", method="confab", job_id=unique_id)
         else:
             conformers = conf_gen_rdkit.gen_conformers(smiles, no_conformers)
             conf_gen_rdkit.write_confs_to_pdb(conformers)
-            return render_template("index.html", method="rdkit", mol=smiles_no_special_chars[0:10])
+            return render_template("rdkit.html", method="rdkit", job_id=unique_id)
         
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0", debug=True)
 
