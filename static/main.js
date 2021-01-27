@@ -3,14 +3,14 @@ jQuery('button').click( function(e) {
 });
 
 const formSubmit = document.querySelector("#submission-form");
-const pdbFile = document.querySelector('#pdb');
+const MolFile = document.querySelector('#mol_file');
 const Smiles = document.querySelector('#smiles');
 const submitButton = document.querySelector('#submit-button');
 const msg = document.querySelector('.msg');
 const Spinner = document.querySelector('#spinner');
 
 function errorMessage() {
-    msg.innerHTML = "Provide either a valid PDB or SMILES string of your molecule.";
+    msg.innerHTML = "Provide either a valid file format or SMILES string of your molecule.";
     msg.style.color = "red";
     msg.style.paddingTop = "10px";
     setTimeout(function() {
@@ -41,9 +41,11 @@ function showSpinner() {
 
 formSubmit.addEventListener('submit', function(e) {
 
+    const allowed_ext = ['pdb', 'sdf'];
+
     if (Smiles.value) {
         showSpinner();
-    } else if (pdbFile.value.split('.').pop() == "pdb") {
+    } else if (allowed_ext.includes(MolFile.value.split('.').pop())) {
         showSpinner();
     } else {
         e.preventDefault();

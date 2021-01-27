@@ -3,15 +3,15 @@
 {% block form %}
     <div id="options">
         <ul class="nav nav-pills" style="margin-bottom:15px;">
-            <li class="nav-item" style="padding-left:20px">
+            <li class="nav-item" style="padding-left:15px">
                 <a class="nav-link" aria-current="page" href="{{ url_for('rdkit') }}">RDKit</a>
             </li>
             <li class="nav-item" style="padding-left:0px;">
                 <a class="nav-link active" href="{{ url_for('confab_page') }}">Confab</a>
             </li>
         </ul>
-        <label style="text-align: right;">Upload your molecule (PDB format):</label>
-        <input type="file" id="pdb" name="pdb_molecule"><br>
+        <label style="text-align: right;">Upload your molecule (pdb/sdf):</label>
+        <input type="file" id="mol_file" name="molecule_file"><br>
         <label style="text-align: right;">or, provide a canonical SMILES:</label>
         <input type="text" id="smiles" name="smiles_molecule"><br>
         <label style="text-align: right;">Number of conformers:</label>
@@ -21,7 +21,23 @@
             <option selected="MMFF94" value="mmff94">MMFF94</option>
             <option value="gaff">AMBER</option>
             <option value="uff">UFF</option>
-        </select>
+        </select><br>
+        <label style="text-align: right;">Output format:</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="output_ext" id="radio_pdb" value="PDB" checked="checked">
+            <label class="form-check-label" for="radio_pdb">pdb</label>
+            <input class="form-check-input" type="radio" name="output_ext" id="radio_sdf" value="SDF">
+            <label class="form-check-label" for="radio_sdf">sdf</label>
+            <!-- <input class="form-check-input" type="radio" name="output_ext" id="radio_mol2" value="Mol2">
+            <label class="form-check-label" for="radio_mol2">mol2</label> -->
+        </div><br>
+        <label style="text-align:right;">Conformers in seperate files: </label>
+        <div class="form-check form-check-inline" id="seperate_files">
+            <input class="form-check-input" type="radio" name="output_seperate" id="radio_seperate" value="True" checked="checked">
+            <label class="form-check-label" for="radio_seperate">Yes</label>
+            <input class="form-check-input" type="radio" name="output_seperate" id="radio_merged" value="False">
+            <label class="form-check-label" for="radio_merged">No</label>
+        </div>
     </div>
     <br>
     <div class="msg"></div>

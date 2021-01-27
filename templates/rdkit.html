@@ -4,7 +4,7 @@
     <title>Free Ligand Conformer Generator</title>
     <meta charset="utf-8">
     <meta name="description" content="Small molecule (ligand) conformer generation with OpenBabel and Rdkit">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href="static/style.css">
@@ -25,10 +25,10 @@
                         <li><button class="btn btn-secondary" type="button" data-toggle="collapse" data-target="#collapseContact" aria-expanded="false" aria-controls="collapseContact">
                         Contact </button></li>
                         <div class="collapse" id="collapseHow">
-                            <div class="card card-body text-justify" style="width:800px;height:220px;margin:auto;margin-top:10px;font-size:16px;">
+                            <div class="card card-body text-justify" style="width:800px;height:240px;margin:auto;margin-top:10px;font-size:16px;">
                                 <p>Ligand conformer generation is usually performed prior to (protein) ligand docking. 
-                                    OpenBabel Confab [1] generates low energy ligand conformers. RDKit [2] uses the ETKDG method. May not work for either too large or too small molecules. 
-                                    Three force field options are provided for Confab. </p>
+                                    OpenBabel Confab [1] generates low energy ligand conformers. RDKit [2] uses the ETKDG method. May take a while if generating many conformers and
+                                    may also not work for either too large or too small molecules. Three force field options are provided for Confab. </p>
                                     <p style="margin-top:10px;">[1]<a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3073927/" target="_blank"> https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3073927/ </a></p>
                                     <p>[2]<a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a></p>
                                     <p style="color:red;padding-right:20px;margin-top:20px;"> Avoid ambiguities in the PDB file, primarily in the atom name column and also the last atom column.</p>
@@ -46,7 +46,7 @@
                         </div>
                     </ul><br>
                 </div>
-                <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;">
+                <div id="video_confs" style="margin-top:-30px; margin-bottom:-60px;margin-left:-10px;">
                     <video muted loop autoplay id="metho" width="540px" height="390px" style="margin-left:-10px;">
                         <source src="static/metho.mp4" type="video/mp4">
                     </video>
@@ -59,19 +59,35 @@
                 {% block form %}
                 <div id="options">
                     <ul class="nav nav-pills" style="margin-bottom:15px;">
-                        <li class="nav-item" style="padding-left:20px;">
+                        <li class="nav-item" style="padding-left:15px;">
                             <a class="nav-link active" aria-current="page" href="{{ url_for('rdkit') }}">RDKit</a>
                         </li>
                         <li class="nav-item" style="padding-left:0px;">
                             <a class="nav-link" href="{{ url_for('confab_page') }}">Confab</a>
                         </li>
                     </ul>
-                    <label style="text-align: right;">Upload your molecule (PDB format):</label>
-                    <input type="file" id="pdb" name="pdb_molecule"><br>
+                    <label style="text-align: right;">Upload your molecule (pdb/sdf):</label>
+                    <input type="file" id="mol_file" name="molecule_file"><br>
                     <label style="text-align: right;">or, provide a canonical SMILES:</label>
                     <input type="text" id="smiles" name="smiles_molecule"><br>
                     <label style="text-align: right;">Number of conformers:</label>
                     <input type="number" id="confs" name="no_conformers" max=500 min=50 value=100 step=50><br>
+                    <label style="text-align: right;">Output format:</label>
+                    <div class="form-check form-check-inline">
+                        <input class="form-check-input" type="radio" name="output_ext" id="radio_pdb" value="PDB" checked="checked">
+                        <label class="form-check-label" for="radio_pdb">pdb</label>
+                        <input class="form-check-input" type="radio" name="output_ext" id="radio_sdf" value="SDF">
+                        <label class="form-check-label" for="radio_sdf">sdf</label>
+                        <!-- <input class="form-check-input" type="radio" name="output_ext" id="radio_mol2" value="Mol2">
+                        <label class="form-check-label" for="radio_mol2">mol2</label> -->
+                    </div><br>
+                    <label style="text-align:right;">Conformers in seperate files: </label>
+                    <div class="form-check form-check-inline" id="seperate_files">
+                        <input class="form-check-input" type="radio" name="output_seperate" id="radio_seperate" value="True" checked="checked">
+                        <label class="form-check-label" for="radio_seperate">Yes</label>
+                        <input class="form-check-input" type="radio" name="output_seperate" id="radio_merged" value="False">
+                        <label class="form-check-label" for="radio_merged">No</label>
+                    </div>
                 </div>
                 <br>
                 <div class="msg"></div>

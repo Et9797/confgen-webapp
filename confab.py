@@ -1,9 +1,17 @@
+import os
 from openbabel import openbabel as ob
 from openbabel import pybel
 
 
-def generate_conformers(smiles, force_field):
-    mole = pybel.readstring("can", smiles)
+def generate_conformers(*args, force_field):
+
+    """ Generate conformers"""
+
+    molecule = args[0]
+    if molecule.endswith(".sdf"):
+        mole = next(pybel.readfile("sdf", molecule))
+    else:
+        mole = pybel.readstring("can", molecule)
     mole.addh()
     mole.make3D()
     mole = mole.OBMol
@@ -16,11 +24,29 @@ def generate_conformers(smiles, force_field):
     return mole
 
 
-def write_conformers(mole, n_conformers):
-    #n_conformers is a list with conf_ids 
+def write_conformers(mole, confid_list, output_ext, seperate_files):
+
+    """Write conformers to file"""
+
     cv = ob.OBConversion()
-    cv.SetOutFormat("pdb")
-    for index, conf_nr in enumerate(n_conformers):
-        print(conf_nr)
-        mole.SetConformer(conf_nr)
-        cv.WriteFile(mole, f"conformer_{index}.pdb")
+    cv.SetOutFormat(output_ext.lower())
+    if seperate_files == "True":
+        for index, conf_nr in enumerate(confid_list):
+            mole.SetConformer(conf_nr)
+            cv.WriteFile(mole, f"conformer_{index}.{output_ext.lower()}")
+    else:
+        for index, conf_nr in enumerate(confid_list):
+            mole.SetConformer(conf_nr)
+            cv.WriteFile(mole, f"conformer_{index}.{output_ext.lower()}")
+        with open(f"ConformersMerged.{output_ext.lower()}", "a") as merged:
+            for f in os.listdir():
+                if f.startswith("conformer_"):
+                    with open(f, "r") as conf:
+                        conformer = conf.read()
+                        merged.write(conformer)
+        [os.remove(f) for f in os.listdir() if f.startswith("conformer_")]
+
+
+
+#conformers = generate_conformers("mtx.sdf", force_field="mmff94")
+#write_conformers(conformers, list(range(50)), "PDB", "False")
