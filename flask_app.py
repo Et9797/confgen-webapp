@@ -109,8 +109,7 @@ def serve_pdbs(method, job_id):
 
             shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
 
-            return send_file(mol_mem, mimetype="application/zip", as_attachment=True, 
-            attachment_filename=name_file, cache_timeout=0)
+            return send_file(mol_mem, as_attachment=True, attachment_filename=name_file, cache_timeout=0)
         else:
             zipfolder = zipfile.ZipFile("Conformers.zip", "w", zipfile.ZIP_STORED)
             for f in os.listdir():
