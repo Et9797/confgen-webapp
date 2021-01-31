@@ -105,10 +105,7 @@ def serve_pdbs(method, job_id):
             with open(name_file, "rb") as fo:
                 mol_mem.write(fo.read())
                 mol_mem.seek(0)
-            fo.close()
-
             shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
-
             return send_file(mol_mem, as_attachment=True, attachment_filename=name_file, cache_timeout=0)
         else:
             zipfolder = zipfile.ZipFile("Conformers.zip", "w", zipfile.ZIP_STORED)
@@ -120,10 +117,7 @@ def serve_pdbs(method, job_id):
             with open(zipfolder.filename, "rb") as fo:
                 zip_mem.write(fo.read())
                 zip_mem.seek(0)
-            fo.close()
-
             shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
-
             return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
             attachment_filename="Conformers.zip", cache_timeout=0)
     else:
@@ -161,9 +155,7 @@ def form_handler(method):
             mol_file.save(os.path.join(mol_path, mol_file.filename))
             if extension == "pdb": #use the NIH converter to get SMILES from PDB 
                 smiles = pdbToSmileConverter.pdb_to_smiles(os.path.join(mol_path, mol_file.filename))
-
         os.chdir(mol_path)
-
         if method == "confab":
             if smiles:
                 mole = confab.generate_conformers(smiles, force_field=force_field)
