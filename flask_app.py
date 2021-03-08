@@ -82,13 +82,11 @@ def confab_page():
 
 @app.route("/reset/<method>/<job_id>")
 def reset(method, job_id):
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
+    try:
         shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
-        if method == "confab":
-            return redirect(url_for("confab_page"))
-        else:
-            return redirect(url_for("rdkit"))
-    else:
+    except:
+        pass #no job_id dir since user pressed download and subsequently reset (download removes job_id dir)
+    finally:
         if method == "confab":
             return redirect(url_for("confab_page"))
         else:
