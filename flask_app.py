@@ -21,17 +21,17 @@ from flask import Flask, Response, render_template, request, redirect, url_for, 
 from flask_mail import Mail, Message
 from config import mail_username, mail_password
 
-#/var/www/html/log.txt
+#/var/www/html/private_confgen/log.txt
 logging.basicConfig(filename="/var/www/html/private_confgen/log.txt", level=logging.DEBUG, format='%(asctime)s %(message)s')
 
+#change to '/var/www/html/private_confgen/MOLECULE_UPLOADS/'
 BASE_DIR = '/var/www/html/private_confgen/'
 MOLECULE_UPLOADS = '/var/www/html/private_confgen/MOLECULE_UPLOADS/'
-#change to '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
 
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
 app.config["MOLECULE_UPLOADS"] = MOLECULE_UPLOADS
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #don't cache the files
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #no caching of the files
 app.config["MAIL_SERVER"] = "smtp-mail.outlook.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
@@ -98,8 +98,9 @@ def reset(method, job_id):
 @app.route("/<method>/<job_id>") 
 def serve_pdbs(method, job_id): 
     if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
+        #check if a merged pdb/sdf file exists  
         match = [f for f in os.listdir() if f.startswith("ConformersMerged")]
-        if match: #check if merged pdb/sdf file exists 
+        if match:
             name_file = match[0]
             mol_mem = io.BytesIO()
             with open(name_file, "rb") as fo:
@@ -143,19 +144,26 @@ def form_handler(method):
             f.write(f"\t \t Smiles: {smiles} \n")
             f.write(f"\t \t PDB: {mol_file.filename} \n")
             f.write(f"\t \t N_conformers: {no_conformers} \n \n")
+
         if smiles:
             mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], unique_id)
             os.mkdir(mol_path)
-        else: #file was provided
-            extension = mol_file.filename.split(".")[-1] 
+
+        #else file was provided
+        else:
             allowed_ext = ["pdb", "sdf"]
+            extension = mol_file.filename.split(".")[-1] 
             assert extension in allowed_ext
             mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], unique_id)
             os.mkdir(mol_path)
             mol_file.save(os.path.join(mol_path, mol_file.filename))
-            if extension == "pdb": #use the NIH converter to get SMILES from PDB 
+            
+            #use the NIH converter to get SMILES from PDB 
+            if extension == "pdb":
                 smiles = pdbToSmileConverter.pdb_to_smiles(os.path.join(mol_path, mol_file.filename))
+
         os.chdir(mol_path)
+
         if method == "confab":
             if smiles:
                 mole = confab.generate_conformers(smiles, force_field=force_field)
@@ -166,13 +174,19 @@ def form_handler(method):
                 confab.write_conformers(mole, conf_sample, output_ext, output_seperate)
             else:
                 confab.write_conformers(mole, range(mole.NumConformers()), output_ext, output_seperate)
+
             return render_template("confab.html", method="confab", job_id=unique_id)
+
+        #rdkit
         else:
             if smiles:
                 conformers = conf_gen_rdkit.gen_conformers(smiles, no_conformers=no_conformers)
-            else: #sdf was provided (or other file ext [only sdf for now])
+
+            #sdf was provided (or other file ext [only sdf for now])
+            else:
                 conformers = conf_gen_rdkit.gen_conformers(mol_file.filename, no_conformers=no_conformers)
-            conf_gen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+                conf_gen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+
             return render_template("rdkit.html", method="rdkit", job_id=unique_id)
         
 
