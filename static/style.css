@@ -80,7 +80,7 @@ body {
 }
 
 #options input[type="text"] {
-    width:420px;
+    width:400px;
     height:25px;
     font-size:14px;
 }
@@ -98,7 +98,7 @@ body {
 
 #options input[type="file"]{
     margin-bottom:3px;
-    width:450px;
+    width:400px;
     font-size: 14px;
 }
 

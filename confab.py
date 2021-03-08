@@ -47,6 +47,3 @@ def write_conformers(mole, confid_list, output_ext, seperate_files):
         [os.remove(f) for f in os.listdir() if f.startswith("conformer_")]
 
 
-
-#conformers = generate_conformers("mtx.sdf", force_field="mmff94")
-#write_conformers(conformers, list(range(50)), "PDB", "False")

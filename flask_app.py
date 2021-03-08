@@ -22,10 +22,10 @@ from flask_mail import Mail, Message
 from config import mail_username, mail_password
 
 #/var/www/html/log.txt
-logging.basicConfig(filename="log.txt", level=logging.DEBUG, format='%(asctime)s %(message)s')
+logging.basicConfig(filename="/var/www/html/private_confgen/log.txt", level=logging.DEBUG, format='%(asctime)s %(message)s')
 
-BASE_DIR = '/home/et/personal_projects/private_confgen/'
-MOLECULE_UPLOADS = '/home/et/personal_projects/private_confgen/MOLECULE_UPLOADS/'
+BASE_DIR = '/var/www/html/private_confgen/'
+MOLECULE_UPLOADS = '/var/www/html/private_confgen/MOLECULE_UPLOADS/'
 #change to '/var/www/html/rdkit-obabel-confgen/MOLECULE_UPLOADS/'
 
 app = Flask(__name__)
