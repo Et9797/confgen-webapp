@@ -60,7 +60,7 @@
                 <div id="options">
                     <ul class="nav nav-pills" style="margin-bottom:15px;">
                         <li class="nav-item" style="padding-left:15px;">
-                            <a class="nav-link active" aria-current="page" href="{{ url_for('rdkit') }}">RDKit</a>
+                            <a class="nav-link active" aria-current="page" href="{{ url_for('rdkit_page') }}">RDKit</a>
                         </li>
                         <li class="nav-item" style="padding-left:0px;">
                             <a class="nav-link" href="{{ url_for('confab_page') }}">Confab</a>
@@ -104,7 +104,7 @@
                     var submitBtn = document.querySelector("#submit-button");
                     submitBtn.remove();
                 </script>
-                <a href='{{ url_for("serve_pdbs", method=method, job_id=job_id) }}'>
+                <a href='{{ url_for("serve_files", method=method, job_id=job_id) }}'>
                     <button type="button" class="btn btn-success">Download</button></a>
                 <a href="{{ url_for('reset', method=method, job_id=job_id) }}">
                     <button type="button" class="btn btn-warning">Reset</button></a>

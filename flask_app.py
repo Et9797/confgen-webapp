@@ -15,18 +15,15 @@ from openbabel import pybel
 import confab 
 from rdkit import Chem
 from rdkit.Chem import AllChem
-import conf_gen_rdkit
+import confgen_rdkit
 import pdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
 from flask_mail import Mail, Message
 from config import mail_username, mail_password
 
-#/var/www/html/private_confgen/log.txt
-logging.basicConfig(filename="/var/www/html/private_confgen/log.txt", level=logging.DEBUG, format='%(asctime)s %(message)s')
-
 #change to '/var/www/html/private_confgen/MOLECULE_UPLOADS/'
-BASE_DIR = '/var/www/html/private_confgen/'
-MOLECULE_UPLOADS = '/var/www/html/private_confgen/MOLECULE_UPLOADS/'
+BASE_DIR = '/home/et/personal_projects/private-confgen/'
+MOLECULE_UPLOADS = '/home/et/personal_projects/private-confgen/MOLECULE_UPLOADS/'
 
 app = Flask(__name__)
 app.config["BASE_DIR"] = BASE_DIR
@@ -46,10 +43,9 @@ def internal_error(exception):
     with open(os.path.join(app.config["BASE_DIR"], "error.log"), "a") as f:
         f.write(time.strftime("%d/%m %H:%M:%S") + "\n")
         exc_type, _ , _ = sys.exc_info()
-        f.write(traceback.format_exc())
-        f.write(f"{exc_type.__name__}" + "\n \n")
         if exc_type.__name__ == "ArgumentError":
             exc_type.__name__= "SMILES Parse Error"
+        f.write(f"{exc_type.__name__}\n\n")
     current_page = request.path.strip("/")
     return render_template(f"{current_page}.html", err=str(exc_type.__name__))
 
@@ -62,16 +58,16 @@ def contact():
         msg = Message(subject="Conformer Webapp", body=f"Email: {email} \n \n{message}",
         sender=mail_username, recipients=[mail_username])
         mail.send(msg)
-        return redirect(url_for("rdkit")) 
+        return redirect(url_for("rdkit_page")) 
     
 
 @app.route("/")
 def index():
-    return redirect(url_for("rdkit"))
+    return redirect(url_for("rdkit_page"))
     
 
 @app.route("/rdkit")
-def rdkit():
+def rdkit_page():
     return render_template("rdkit.html")
 
 
@@ -85,16 +81,16 @@ def reset(method, job_id):
     try:
         shutil.rmtree(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
     except:
-        pass #no job_id dir since user pressed download and subsequently reset (download removes job_id dir)
+        pass #no job_id dir since user pressed download and then reset (download deletes job_id dir) 
     finally:
         if method == "confab":
             return redirect(url_for("confab_page"))
         else:
-            return redirect(url_for("rdkit"))
+            return redirect(url_for("rdkit_page"))
 
 
 @app.route("/<method>/<job_id>") 
-def serve_pdbs(method, job_id): 
+def serve_files(method, job_id): 
     if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
         #check if a merged pdb/sdf file exists  
         match = [f for f in os.listdir() if f.startswith("ConformersMerged")]
@@ -123,7 +119,7 @@ def serve_pdbs(method, job_id):
         if method == "confab":
             return redirect(url_for("confab_page"))
         else:
-            return redirect(url_for("rdkit"))
+            return redirect(url_for("rdkit_page"))
 
 
 @app.route("/<method>", methods=["POST", "GET"])
@@ -137,6 +133,7 @@ def form_handler(method):
         no_conformers = int(request.form["no_conformers"])
         output_ext = request.form["output_ext"]
         output_seperate = request.form["output_seperate"]
+
         with open(os.path.join(app.config["BASE_DIR"], "molecules.txt"), "a") as f:
             f.write(time.strftime("%d/%m %H:%M:%S") + "\n")
             f.write(f"\t \t Smiles: {smiles} \n")
@@ -146,9 +143,8 @@ def form_handler(method):
         if smiles:
             mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], unique_id)
             os.mkdir(mol_path)
-
-        #else file was provided
         else:
+            #else file was provided
             allowed_ext = ["pdb", "sdf"]
             extension = mol_file.filename.split(".")[-1] 
             assert extension in allowed_ext
@@ -175,15 +171,15 @@ def form_handler(method):
 
             return render_template("confab.html", method="confab", job_id=unique_id)
 
-        #rdkit
+        #else method is rdkit
         else:
             if smiles:
-                conformers = conf_gen_rdkit.gen_conformers(smiles, no_conformers=no_conformers)
-
-            #sdf was provided (or other file ext [only sdf for now])
+                conformers = confgen_rdkit.gen_conformers(smiles, no_conformers=no_conformers)
             else:
-                conformers = conf_gen_rdkit.gen_conformers(mol_file.filename, no_conformers=no_conformers)
-                conf_gen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+                #sdf was provided (or other file ext, but only sdf for now)
+                conformers = confgen_rdkit.gen_conformers(mol_file.filename, no_conformers=no_conformers)
+            
+            confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
 
             return render_template("rdkit.html", method="rdkit", job_id=unique_id)
         
