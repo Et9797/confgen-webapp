@@ -16,7 +16,7 @@ import confab
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import confgen_rdkit
-import pdbToSmileConverter
+import PdbToSmileConverter
 from flask import Flask, Response, render_template, request, redirect, url_for, send_file
 from flask_mail import Mail, Message
 from config import mail_username, mail_password
