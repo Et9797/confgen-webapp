@@ -19,7 +19,7 @@ def pdb_to_smiles(ligand_pdb):
                 "dim": "2D"
             }
             r = requests.post(url, files=pdb_file, data=data)
-        except requests.exceptions.HTTPError as e:
+        except Exception as e:
             raise e 
 
     pattern = re.compile(r"<B>.+</B>")
