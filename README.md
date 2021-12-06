@@ -1,4 +1,4 @@
-## Conformer Generator
-Webapp to generate ligand conformers for ligand docking.
+## Small molecule conformer generation
+Webapp to generate small ligand conformers for (protein)-ligand docking using RDKit.
 
-confgen.net
+http://confgen.net
