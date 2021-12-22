@@ -43,7 +43,7 @@ def contact():
                       sender = app.config["MAIL_USERNAME"], recipients = [app.config["MAIL_USERNAME"]]
                      )
         mail.send(msg)
-        return redirect(url_for("index"))
+        return ('', 204)
     
 @app.route("/")
 def index():
