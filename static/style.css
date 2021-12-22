@@ -1,154 +1,164 @@
-html {
-    overflow-y:scroll;
+.container {
+    padding-left: 0;
+    padding-right: 0;
 }
 
-body {
-    zoom:0.9;
-    /* transform: scale(0.9);  */
-    padding:0;
-    margin:0;
-    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    text-align:center;
-    font-size:18px;
+.main-flex-container {
+    height: 100vh;
 }
 
-/* div.zoomed { 
-    zoom: 3; 
-    -moz-transform: scale(3); 
-    -moz-transform-origin: 0 0;
-}  */
-
-#main-header h1 {
-    padding-top:20px;
-    margin-bottom:0px;
-    text-transform:capitalize;
-    font-family: Georgia;
-    font-weight:bold;
-    font-size:50px;
+.navbar-brand {
+    font-weight: 600;
+    font-size: 16px;
 }
 
-#main-header p {
-    margin:0;
-    font-family:Georgia, serif;
+.navbar {
+    justify-content: space-evenly;
 }
 
-/* Links */
-#links ul {
-    position:relative;
-    margin-bottom:10px;
-    margin-left:-40px;
+.navbar-nav {
+    padding-top: 6px;
 }
 
-#links li {
-    display:inline;
+.nav-link:hover {
+    background-color: rgb(255, 255, 255);
+    outline: 1px solid grey;
 }
 
-#links li:nth-child(n+1){
-    position:relative;
-    margin:2px;
+.btn:focus, .btn:active {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
-#links li:nth-child(1){
-    margin-right:10px;
+video {
+    width: auto;
+    height: auto;
+    max-height: 400px;
 }
 
-.card-body {
-    padding-left:30px;
-    padding-right:30px;
+#main-form {
+    border: 1px solid lightgrey;
+    padding: 20px;
+    border-radius: 15px;
 }
 
-
-
-/* Submission form */
-#submission-form {
-    margin:auto;
-    margin-top:60px;
+.footer-bottom {
+    font-size: 9px;
+    align-self: center;
+    margin-top: auto;
 }
 
-#options {
-    display:inline-block;
-    text-align:left;
-    position:relative;
-    border:1px rgb(0, 0, 0) solid;
-    padding:20px;
-    border-radius:15px;
-    box-shadow:2px 2px 10px 0px grey;
+.primaryBtns {
+    display: grid;
 }
 
-#options label {
-    width:320px;
+.primaryBtns > * {
+    height: 3em;
+    width: 10em;
+    font-size: 16px;
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    visibility: hidden;
 }
 
-#options input[type="text"] {
-    width:400px;
-    height:25px;
-    font-size:14px;
+.submitBtn {
+    visibility: visible;
 }
 
-#options input[type="number"]{
-    height:25px;
-    width:70px;
-    font-size:16px;
+.alerts {
+    display: grid;
+    margin-top: 10px;
 }
 
-#ff {
-    width:150px;
-    height:40px;
+.alerts-container {
+    max-width: 50%;
 }
 
-#options input[type="file"]{
-    margin-bottom:3px;
-    width:400px;
-    font-size: 14px;
+.alerts .alert-success, .alerts .alert-danger {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: center;
+    visibility: hidden;
 }
 
-.form-check-inline {
-    margin-left:10px;
-    width:115px;
+.alert-message-slideIn {
+    animation-name: slideIn;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+    animation-direction: forwards;
 }
 
-
-#submit-button {
-    margin-top:15px;
-    font-size: 18px;
+.alert-message-slideOut {
+    animation-name: slideOut;
+    animation-duration: 0.3s;
+    animation-timing-function: ease-out;
+    animation-direction: reverse;
 }
 
-/* Footer workaround*/
-#page-container {
-    position:relative;
-    min-height:111vh;
+@keyframes slideIn {
+    0% {
+        transform: skewX(53deg) translateX(-2000px);
+    }
+
+    100% {
+        transform: skewX(0deg);
+    }
 }
 
-#content-wrap{
-    padding-bottom: 1.5rem;
-    padding-bottom:70px;
+@keyframes slideOut {
+    0% {
+        transform: skewX(53deg) translateX(-2000px);
+    }
+
+    100% {
+        transform: skewX(0deg);
+    }
 }
 
-#main-footer {
-    position:absolute;
-    bottom:0;
-    width:100%;
-    height:1.5rem;
-    font-size:10px;
+@media (min-width: 768px) {
+    .navbar-brand {
+        font-size: 20px;
+    }
+
 }
 
-/* Spinner */
-#spinner{
-    position:absolute;
-    margin-left:-18px;
-    margin-top:-37px;
-    visibility:hidden;
+@media (min-width: 992px) {
+    .navbar-brand {
+        font-size: 24px;
+        margin-left: 1em;
+    }
+
+    .navbar-brand::after {
+        content: "with RDKit";
+        font-size: 12px;
+        margin-left: 10px;
+    }
+
+    #main-nav {
+        justify-content: center;
+    }
+
+    .navbar-expand-lg .navbar-nav {
+        gap: 2em;
+    }
+
+}
+
+@media (min-width: 1200px) {
+    .navbar-brand {
+        font-size: 32px;
+    }
+
 }
 
 /* Download & Reset buttons */
-.btn-success {
-    margin-top:15px;
+.btn-success, .btn-warning {
     font-size:18px;
     color:white;
 }
 
 .btn-warning {
-    margin-top:15px;
     font-size:18px;
     color:white;
 }

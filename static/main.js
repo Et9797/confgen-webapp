@@ -1,56 +1,87 @@
-jQuery('button').click( function(e) {
-    jQuery('.collapse').collapse('hide');
-});
+$(".sendBtnContactForm").on("click", () => {
+    $(".alertContact").css("visibility", "visible")
+    setTimeout(() => $(".alertContact").css("visibility", "hidden"), 5000)
+})
 
-const formSubmit = document.querySelector("#submission-form");
-const MolFile = document.querySelector('#mol_file');
-const Smiles = document.querySelector('#smiles');
-const submitButton = document.querySelector('#submit-button');
-const msg = document.querySelector('.msg');
-const Spinner = document.querySelector('#spinner');
+$("#contact-form").on("submit", (e) => {
+    e.preventDefault()
+    const formData = new FormData($("#contact-form")[0])
+    fetch("/contact", {
+        method: "POST",
+        body: formData
+    })
+})
 
-function errorMessage() {
-    msg.innerHTML = "Provide either a valid file format or SMILES string of your molecule.";
-    msg.style.color = "red";
-    msg.style.paddingTop = "10px";
-    setTimeout(function() {
-        msg.innerHTML=null;
-        msg.style.paddingTop= "0px";
-    }, 3000);
+$("#molRadio").on("click", () => {
+    $("#seperateFiles").prop("checked", true)
+    $("#seperateFiles").attr("onclick", 'return false;')
+    $("#seperateFiles").attr("onkeydown", 'return false;')
+})
 
-};
+$("#pdbRadio, #sdfRadio").on("click", () => {
+    $("#seperateFiles").attr("onclick", '')
+    $("#seperateFiles").attr("onkeydown", '')
+})
 
-function errorScript(err) {
-    var err_msg = err;
-    let h3_ele = document.querySelector('#err_msg')
-    h3_ele.innerHTML=err_msg.replace(/"/g,"")
-    h3_ele.style.color = "red";
-    h3_ele.style.paddingTop = "10px";
-    setTimeout(function() { 
-        h3_ele.innerHTML=null;
-        h3_ele.style.paddingTop = "0px";
-    }, 10000); 
-};
-
-function showSpinner() {
-
-    submitButton.style.visibility = "hidden";
-    Spinner.style.visibility = "visible";
-
-};
-
-formSubmit.addEventListener('submit', function(e) {
-
-    const allowed_ext = ['pdb', 'sdf'];
-
-    if (Smiles.value) {
-        showSpinner();
-    } else if (allowed_ext.includes(MolFile.value.split('.').pop())) {
-        showSpinner();
-    } else {
-        e.preventDefault();
-        errorMessage();
+$("#main-form").on("submit", (e) => {
+    e.preventDefault()
+    const allowedExtensions = ["pdb", "sdf", "mol"]
+    const formData = new FormData($("#main-form")[0])
+    const smiles = Array.from(formData.entries())[1][1]
+    const molFile = Array.from(formData.entries())[0][1]["name"]
+    const noConfs = Array.from(formData.entries())[2][1]
+    const asyncSubmit = () => {
+        $(".submitBtn").css("visibility", "hidden")
+        $(".generatingBtn").css("visibility", "visible")
+        fetch("/generate", {
+            method: "POST",
+            body: formData
+        }).then(async (response) => {
+            if (response.ok) {
+                return response.json()
+            }
+            const error = await response.json()
+            throw new Error(error.exception)
+        }).then(jsonResponse => {
+            $(".generatingBtn").css("visibility", "hidden")
+            showAlert("success", 5000, noConfs, null)
+            $(".download-reset-btns").css("visibility", "visible")
+            $("#downloadBtn").prop("href", `/generate/${jsonResponse["job_id"]}`)
+        }).catch(exc => {
+            $(".generatingBtn").css("visibility", "hidden")
+            $(".submitBtn").css("visibility", "visible")
+            showAlert("danger", 10000, null, exc.message)
+        })
+    }
+    if (smiles) {
+        asyncSubmit()
+    }
+    else if (allowedExtensions.includes(molFile.split(".").pop())) {
+        asyncSubmit()
+    }
+    else {
+        showAlert("danger", 5000, null, "provide a valid file format.")
     }
 
-});
+})
 
+function showAlert(type, duration, noConfs, exception) {
+    const alertFade = $(`.alerts .alert-${type}`)
+    alertFade.empty()
+    if (type == "success") {
+        alertFade.append(`<i class="fas fa-check"></i> Successfully generated ${noConfs} conformers.`)
+    } else if (type == "danger") {
+        alertFade.append(`<i class="fas fa-times"></i> Something went wrong. Check if the provided file/SMILES is correct. 
+        Exception: ${exception}`) 
+    }
+    alertFade.css("visibility", "visible")
+    alertFade.addClass("alert-message-slideIn")
+    setTimeout(() => {
+        alertFade.removeClass("alert-message-slideIn")
+        alertFade.addClass("alert-message-slideOut")
+        setTimeout(() => {
+            alertFade.css("visibility", "hidden")
+            alertFade.removeClass("alert-message-slideOut")
+        }, 300)
+    }, duration)
+}
