@@ -52,6 +52,7 @@ def index():
 @app.route("/generate/<job_id>") 
 def serve_files(job_id): 
     if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
+        os.chdir(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
         match = [f for f in os.listdir() if f.startswith("ConformersMerged")]
         if match:
             name_file = match[0]
@@ -107,20 +108,20 @@ def form_handler():
                     smiles = PdbToSmileConverter.pdb_to_smiles(os.path.join(mol_path, mol_file.filename))
                 except Exception as e:
                     app.logger.error(traceback.format_exc())
-                    return jsonify({'exception': str(e)}), 500
-
-        os.chdir(mol_path)
+                    return jsonify({'exception': 'Something went wrong trying to convert PDB to Smiles'}), 500
 
         try:
+            os.chdir(mol_path)            
             if smiles:
                 conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
             else: 
                 conformers = confgen_rdkit.generate_conformers(mol_file.filename, no_conformers=no_conformers)
+            confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
         except Exception as e:
             app.logger.error(traceback.format_exc())
             return jsonify({'exception': str(e)}), 500
-            
-        confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+        finally:
+            os.chdir(app.config["BASE_DIR"])
 
         return jsonify({"job_id": unique_id})
 
