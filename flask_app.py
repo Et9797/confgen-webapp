@@ -111,19 +111,15 @@ def form_handler():
 
         os.chdir(mol_path)
 
-        if smiles:
-            try:
+        try:
+            if smiles:
                 conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
-            except Exception as e:
-                app.logger.error(traceback.format_exc())
-                return jsonify({'exception': str(e)}), 500
-        else:
-            try:
+            else: 
                 conformers = confgen_rdkit.generate_conformers(mol_file.filename, no_conformers=no_conformers)
-            except Exception as e:
-                app.logger.error(traceback.format_exc())
-                return jsonify({'exception': str(e)}), 500
-
+        except Exception as e:
+            app.logger.error(traceback.format_exc())
+            return jsonify({'exception': str(e)}), 500
+            
         confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
 
         return jsonify({"job_id": unique_id})
