@@ -67,7 +67,7 @@
       <div class="d-flex flex-column main-flex-container">
         <!-- Nav-->
         <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd; margin-bottom: 10px;">
-          <a class="navbar-brand" href="">Small Molecule Conformer Generation</a>
+          <a class="navbar-brand" href="/">Small Molecule Conformer Generation</a>
           <button class="navbar-toggler btn" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -91,7 +91,7 @@
         </video>
         <hr>
         <!-- Form -->
-        <form id="main-form" class="align-self-center" method="post" enctype="multipart/form-data">
+        <form id="main-form" class="align-self-center" method="post" enctype="multipart/form-data" action="{{ url_for('form_handler') }}">
           <div class="form-group row">
             <label for="molInput" class="col col-form-label">Molecule file (pdb/sdf/mol) <b>/</b> Canonical SMILES:</label>
             <div class="col align-self-center">
@@ -145,12 +145,21 @@
             <button type="submit" class="btn btn-primary submitBtn" form="main-form">Submit</button>
             <button class="btn btn-primary generatingBtn" type="button" style="background-color: #0048b3;" disabled>
               <span class="spinner-grow spinner-grow-sm" role="status"></span>
-                Generating...
+              Generating...
             </button>
-            <div class="d-flex justify-content-center align-items-end download-reset-btns gap-2">
-              <a id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
-              <a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning resetBtn" type="button" style="color: white;">Reset</button></a>
-            </div>
+            {% if job_id %}
+              <script>
+                var submitBtn = document.querySelector(".submitBtn")
+                submitBtn.remove()
+              </script>
+              <div class="d-flex justify-content-center align-items-end download-reset-btns gap-2">
+                <a href="{{ url_for('serve_files', job_id=job_id, noConfs=noConfs) }}" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
+                <a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning resetBtn" type="button" style="color: white;">Reset</button></a>
+              </div>
+            {% endif %}
+            {% if error %}
+              <div class="Error" id="{{ error }}"></div>
+            {% endif %}
           </div>
         </form>
         <div class="alerts-container align-self-center">

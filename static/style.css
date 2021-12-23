@@ -59,11 +59,15 @@ video {
     grid-column: 1;
     grid-row: 1;
     justify-self: center;
-    visibility: hidden;
 }
 
 .submitBtn {
     visibility: visible;
+    z-index: 9999;
+}
+
+.generatingBtn {
+    visibility: hidden;
 }
 
 .alerts {
@@ -72,7 +76,7 @@ video {
 }
 
 .alerts-container {
-    max-width: 50%;
+    max-width: 85%;
 }
 
 .alerts .alert-success, .alerts .alert-danger {
@@ -154,11 +158,6 @@ video {
 
 /* Download & Reset buttons */
 .btn-success, .btn-warning {
-    font-size:18px;
-    color:white;
-}
-
-.btn-warning {
     font-size:18px;
     color:white;
 }

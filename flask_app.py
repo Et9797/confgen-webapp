@@ -108,22 +108,24 @@ def form_handler():
                     smiles = PdbToSmileConverter.pdb_to_smiles(os.path.join(mol_path, mol_file.filename))
                 except Exception as e:
                     app.logger.error(traceback.format_exc())
-                    return jsonify({'exception': 'Something went wrong trying to convert PDB to Smiles'}), 500
+                    return render_template("index.html", error="NIH")
+
+        os.chdir(mol_path)            
 
         try:
-            os.chdir(mol_path)            
             if smiles:
                 conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
             else: 
                 conformers = confgen_rdkit.generate_conformers(mol_file.filename, no_conformers=no_conformers)
-            confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
         except Exception as e:
             app.logger.error(traceback.format_exc())
-            return jsonify({'exception': str(e)}), 500
-        finally:
-            os.chdir(app.config["BASE_DIR"])
+            return render_template("index.html", error="rdkit")
 
-        return jsonify({"job_id": unique_id})
+        confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+
+        os.chdir(app.config["BASE_DIR"])
+
+        return render_template("index.html", job_id=unique_id, noConfs=no_conformers)
 
         
 if __name__ == "__main__":
