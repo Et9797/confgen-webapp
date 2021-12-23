@@ -111,15 +111,14 @@ def form_handler():
                     return render_template("index.html", error="NIH")
 
         try:
-            os.chdir(mol_path)            
             if smiles:
                 conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
             else: 
                 conformers = confgen_rdkit.generate_conformers(mol_file.filename, no_conformers=no_conformers)
-            confgen_rdkit.write_confs_to_file(conformers, output_ext, output_seperate)
+            confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_seperate)
         except Exception as e:
-            app.logger.error(traceback.format_exc())
-            return render_template("index.html", error="rdkit")
+           app.logger.error(traceback.format_exc())
+           return render_template("index.html", error="rdkit")
 
         return render_template("index.html", job_id=unique_id, noConfs=no_conformers)
 

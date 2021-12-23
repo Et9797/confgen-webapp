@@ -1,5 +1,6 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
+import os
 
 def generate_conformers(molecule, no_conformers):
 
@@ -18,7 +19,7 @@ def generate_conformers(molecule, no_conformers):
 
     return mol
 
-def write_confs_to_file(molecule, output_ext, seperate_files):
+def write_confs_to_file(molecule, mol_path, output_ext, seperate_files):
 
     """Writes conformers to PDB/SDF/Mol files"""
 
@@ -27,23 +28,23 @@ def write_confs_to_file(molecule, output_ext, seperate_files):
     if seperate_files == "on":
         if output_ext == "pdb":
             for cid in conf_ids:
-                Chem.MolToPDBFile(molecule, f"conformer_{cid}.pdb", confId=cid)
+                Chem.MolToPDBFile(molecule, os.path.join(mol_path, f"conformer_{cid}.pdb"), confId=cid)
         if output_ext == "sdf":
             for cid in conf_ids:
-                sd_writer = Chem.SDWriter(f"conformer_{cid}.sdf")
+                sd_writer = Chem.SDWriter(os.path.join(mol_path, f"conformer_{cid}.sdf"))
                 sd_writer.write(molecule, confId=cid)
                 sd_writer.close()
         if output_ext == "mol":
             for cid in conf_ids:
-                Chem.MolToMolFile(molecule, f"conformer_{cid}.mol", confId=cid)
+                Chem.MolToMolFile(molecule, os.path.join(mol_path, f"conformer_{cid}.mol"), confId=cid)
     if seperate_files == "off":
         if output_ext == "pdb":
-            pdb_writer = Chem.PDBWriter("ConformersMerged.pdb")
+            pdb_writer = Chem.PDBWriter(os.path.join(mol_path, "ConformersMerged.pdb"))
             for cid in conf_ids:
                 pdb_writer.write(molecule, confId=cid)
             pdb_writer.close()
         if output_ext == "sdf":
-            sd_writer = Chem.SDWriter("ConformersMerged.sdf")
+            sd_writer = Chem.SDWriter(os.path.join(mol_path, "ConformersMerged.sdf"))
             for cid in conf_ids:   
                 sd_writer.write(molecule, confId=cid)
             sd_writer.close()
