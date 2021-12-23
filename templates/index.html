@@ -24,6 +24,8 @@
             take a while depending on how many conformers are being generated. Specifically intended for small-molecules, 
             not proteins (look into molecular dynamics for that). May not work for too large or exotic molecules (eg, metallo-ligands). 
             Avoid ambiguities in the PDB file, primarily in the atom name column and the last atom column.</p>
+            <p>If you are getting an empty response page, lower the number of conformers and then generate multiple times until the 
+            desired amount (requests over 1 minute will always time out).
             <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a>
           </div>
           <div class="modal-footer">
@@ -105,7 +107,7 @@
           <div class="form-group row">
             <label for="noConformers" class="col-xl-3 col-form-label">Number of conformers: </label>
             <div class="col">
-              <input type="number" class="form-control" name="noConfs" id="noConformers" max=1000 min=50 value=100 step=50>
+              <input type="number" class="form-control" name="noConfs" id="noConformers" max=500 min=25 value=100 step=25>
             </div>
           </div>
           <fieldset class="form-group">
