@@ -51,24 +51,24 @@ def index():
 
 @app.route("/generate/<job_id>") 
 def serve_files(job_id): 
-    if os.path.exists(os.path.join(app.config["MOLECULE_UPLOADS"], job_id)):
-        os.chdir(os.path.join(app.config["MOLECULE_UPLOADS"], job_id))
-        match = [f for f in os.listdir() if f.startswith("ConformersMerged")]
+    mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], job_id)
+    if os.path.exists(mol_path):
+        match = [f for f in os.listdir(mol_path) if f.startswith("ConformersMerged")]
         if match:
             name_file = match[0]
             mol_mem = io.BytesIO()
-            with open(name_file, "rb") as fo:
+            with open(os.path.join(mol_path, name_file), "rb") as fo:
                 mol_mem.write(fo.read())
                 mol_mem.seek(0)
             return send_file(mol_mem, as_attachment=True, attachment_filename=name_file, cache_timeout=0)
         else:
-            zipfolder = zipfile.ZipFile("Conformers.zip", "w", zipfile.ZIP_STORED)
-            for f in os.listdir():
+            zipfolder = zipfile.ZipFile(os.path.join(mol_path, "Conformers.zip"), "w", zipfile.ZIP_STORED)
+            for f in os.listdir(mol_path):
                 if f.startswith("conformer_"):
-                    zipfolder.write(f)
+                    zipfolder.write(os.path.join(mol_path, f), f)
             zipfolder.close()
             zip_mem = io.BytesIO()
-            with open(zipfolder.filename, "rb") as fo:
+            with open(os.path.join(mol_path, zipfolder.filename), "rb") as fo:
                 zip_mem.write(fo.read())
                 zip_mem.seek(0)
             return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
