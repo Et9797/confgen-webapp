@@ -114,7 +114,7 @@ def form_handler():
             if smiles:
                 conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
             else: 
-                conformers = confgen_rdkit.generate_conformers(mol_file.filename, no_conformers=no_conformers)
+                conformers = confgen_rdkit.generate_conformers(os.path.join(mol_path, mol_file.filename), no_conformers=no_conformers)
             confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_seperate)
         except Exception as e:
            app.logger.error(traceback.format_exc())

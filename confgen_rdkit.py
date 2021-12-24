@@ -2,17 +2,17 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import os
 
-def generate_conformers(molecule, no_conformers):
+def generate_conformers(path_to_molecule, no_conformers):
 
     """Generates conformers for (crystal) ligand"""
 
-    if molecule.endswith("sdf"):
-        sdf_supplier = Chem.SDMolSupplier(molecule)
+    if path_to_molecule.endswith("sdf"):
+        sdf_supplier = Chem.SDMolSupplier(path_to_molecule)
         mol = next(sdf_supplier)
-    elif molecule.endswith("mol"):
-        mol = Chem.MolFromMolFile(molecule)
+    elif path_to_molecule.endswith("mol"):
+        mol = Chem.MolFromMolFile(path_to_molecule)
     else:
-        mol = Chem.MolFromSmiles(molecule)
+        mol = Chem.MolFromSmiles(path_to_molecule)
 
     mol = Chem.AddHs(mol, addCoords=True)
     AllChem.EmbedMultipleConfs(mol, no_conformers, clearConfs=True) #numThreads=0
