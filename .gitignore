@@ -8,3 +8,4 @@ molecules.txt
 scheduler.sh
 test/
 appLog.log
+test_molecules/

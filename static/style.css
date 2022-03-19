@@ -34,6 +34,7 @@ video {
     width: auto;
     height: auto;
     max-height: 400px;
+    margin-bottom: 10px;
 }
 
 #main-form {
@@ -63,7 +64,7 @@ video {
 
 .submitBtn {
     visibility: visible;
-    z-index: 9999;
+    z-index: 2;
 }
 
 .generatingBtn {
@@ -102,21 +103,21 @@ video {
 
 @keyframes slideIn {
     0% {
-        transform: skewX(53deg) translateX(-2000px);
+        transform: skewX(0deg) translateX(-2000px);
     }
 
     100% {
-        transform: skewX(0deg);
+        transform: skewX(21deg);
     }
 }
 
 @keyframes slideOut {
     0% {
-        transform: skewX(53deg) translateX(-2000px);
+        transform: skewX(0deg) translateX(-2000px);
     }
 
     100% {
-        transform: skewX(0deg);
+        transform: skewX(21deg);
     }
 }
 

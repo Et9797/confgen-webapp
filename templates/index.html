@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Free small molecule ligand conformer generator</title>
+    <title>Small molecule conformer generation</title>
     <meta charset="utf-8">
-    <meta name="description" content="Small molecule (ligand) conformer generation with RDKit">
+    <meta name="description" content="Small molecule ligand conformer generation with RDKit">
     <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
@@ -19,14 +19,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close-hiw"></button>
           </div>
           <div class="modal-body">
-            <p>Small-molecule (ligand) conformer generation is usually performed prior to (protein-) ligand docking. 
+            <p>Small-molecule (ligand) conformer generation is usually performed prior to protein-ligand docking. 
             RDKit [1] uses the ETKDG method to generate a collection of diverse low energy conformers. Generation may 
             take a while depending on how many conformers are being generated. Specifically intended for small-molecules, 
-            not proteins (look into molecular dynamics for that). May not work for too large or exotic molecules (eg, metallo-ligands). 
-            Avoid ambiguities in the PDB file, primarily in the atom name column and the last atom column.</p>
-            <p>If you are getting an empty response page, lower the number of conformers and then generate multiple times until the 
-            desired amount (requests over 1 minute will always time out).
-            <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a>
+            not proteins (look into molecular dynamics for that). Avoid ambiguities in the PDB file, primarily in the atom name 
+            column and the last atom column. Uses Knodle [2] for assigning bond orders of ligands provided as PDB format. 
+            Caution is required when providing ligands in PDB format, as Knodle can make errors and fail to assign correct bond orders. 
+            It is advised to use SDF/Mol/Mol2 or preferably SMILES for more complex small molecules.
+            <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a></p>
+            <p style="margin-top: 10px;">[2] <a href="https://team.inria.fr/nano-d/software/knodle/" target="_blank"> https://team.inria.fr/nano-d/software/knodle/</a></p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -56,7 +57,7 @@
           </div>
           <div class="modal-footer">
             <div class="alert alert-success p-2 m-auto alertContact" role="alert" style="visibility: hidden;"> 
-              <i class="fas fa-check"></i> E-mail sent.
+              <i class="fas fa-check"></i> E-mail received.
             </div>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             <button type="submit" class="btn btn-primary sendBtnContactForm" form="contact-form">Send</button>
@@ -76,7 +77,7 @@
           <div class="navbar-collapse collapse" id="main-nav">
             <ul class="navbar-nav text-center">
               <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#howItWorksModal" href="#howItWorksModal">How it works</a>
+                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#howItWorksModal" href="#howItWorksModal"><i class="fas fa-info-circle"></i> How it works</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal" href="#contactModal"><i class="fas fa-envelope"></i> Contact</a>
@@ -91,11 +92,10 @@
         <video muted loop autoplay id="conformersVideo">
           <source src="../static/conformers.mp4" type="video/mp4">
         </video>
-        <hr>
         <!-- Form -->
         <form id="main-form" class="align-self-center" method="post" enctype="multipart/form-data" action="{{ url_for('form_handler') }}">
           <div class="form-group row">
-            <label for="molInput" class="col col-form-label">Molecule file (pdb/sdf/mol) <b>/</b> Canonical SMILES:</label>
+            <label for="molInput" class="col col-form-label">Molecule file (pdb/sdf/mol/mol2) <b>/</b> Canonical SMILES:</label>
             <div class="col align-self-center">
               <input type="file" class="form-control" name="molFile" id="fileInput">
             </div>
@@ -106,7 +106,7 @@
           </div>
           <div class="form-group row">
             <label for="noConformers" class="col-xl-3 col-form-label">Number of conformers: </label>
-            <div class="col">
+            <div class="col" style="max-width: 25%">
               <input type="number" class="form-control" name="noConfs" id="noConformers" max=500 min=25 value=100 step=25>
             </div>
           </div>
@@ -116,30 +116,24 @@
               <div class="col-xl-9 pt-2">
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="outputFormat" id="pdbRadio" value="pdb" checked>
-                  <label class="form-check-label" for="pdbRadio">
-                    pdb
-                  </label>
+                  <label class="form-check-label" for="pdbRadio">pdb</label>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="outputFormat" id="sdfRadio" value="sdf">
-                  <label class="form-check-label" for="sdfRadio">
-                    sdf
-                  </label>
+                  <label class="form-check-label" for="sdfRadio">sdf</label>
                 </div>
                 <div class="form-check">
                   <input class="form-check-input" type="radio" name="outputFormat" id="molRadio" value="mol">
-                  <label class="form-check-label" for="molRadio">
-                    mol
-                  </label>
+                  <label class="form-check-label" for="molRadio">mol</label>
                 </div>
               </div>
             </div>
           </fieldset>
           <div class="form-group row">
-            <div class="col-xl-3 col-form-label">Conformers in seperate files? </div>
+            <div class="col-xl-3 col-form-label">Conformers in separate files? </div>
             <div class="col-xl-9 pt-2">
               <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="seperateFiles" id="seperateFiles" checked>
+                <input class="form-check-input" type="checkbox" name="separateFiles" id="separateFiles" checked>
               </div>
             </div>
           </div>
@@ -150,17 +144,14 @@
               Generating...
             </button>
             {% if job_id %}
-              <script>
-                var submitBtn = document.querySelector(".submitBtn")
-                submitBtn.remove()
-              </script>
-              <div class="d-flex justify-content-center align-items-end download-reset-btns gap-2">
-                <a href="{{ url_for('serve_files', job_id=job_id, noConfs=noConfs) }}" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
-                <a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning resetBtn" type="button" style="color: white;">Reset</button></a>
-              </div>
-            {% endif %}
-            {% if error %}
-              <div class="Error" id="{{ error }}"></div>
+            <script>
+              const submitBtn = document.querySelector(".submitBtn")
+              submitBtn.remove()
+            </script>
+            <div class="d-flex justify-content-center align-items-end download-reset-btns gap-2">
+              <a href="{{ url_for('serve_files', job_id=job_id) }}" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
+              <a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning resetBtn" type="button" style="color: white;">Reset</button></a>
+            </div>
             {% endif %}
           </div>
         </form>

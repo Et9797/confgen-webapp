@@ -3,7 +3,7 @@ import requests
 
 # For converting pdb to smiles to assign bond orders
 
-def pdb_to_smiles(ligand_pdb):
+def convert(ligand_pdb):
     
     """Convert PDB to smiles using NIH's PDB -> Smiles converter"""
 
