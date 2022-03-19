@@ -27,22 +27,27 @@ $("#pdbRadio, #sdfRadio").on("click", () => {
 
 // On form submit
 $("#main-form").on("submit", (e) => {
-    // e.preventDefault()
+    e.preventDefault()
     const allowedExtensions = ["pdb", "sdf", "mol"]
     const formData = new FormData($("#main-form")[0])
     const smiles = Array.from(formData.entries())[1][1]
     const molFile = Array.from(formData.entries())[0][1]["name"]
     const noConfs = Array.from(formData.entries())[2][1]
-    const hideSubmitBtn = () => {
+    
+    const asyncSubmit = async() => {
         // Hide submit button, show generating button
         $(".submitBtn").css("visibility", "hidden")
         $(".generatingBtn").css("visibility", "visible")
         
-        // Call Flask /generate route to generate conformers in the background
-        // fetch("/generate", {
-        //     method: "POST",
-        //     body: formData})
-        // .then(response => response.json())
+        // Calls Flask /generate route to start task in the background
+        const r = await fetch("/generate", {
+            method: "POST",
+            body: formData
+        })
+        const rJSON = await r.json()
+        const uniq_id = rJSON["uniq_id"]
+        const task_id = rJSON["task_id"]
+        
         // .then(jsonResponse => {
         //     // Download button
         //     $(".generatingBtn").css("visibility", "hidden")
@@ -51,38 +56,46 @@ $("#main-form").on("submit", (e) => {
         //     $(".download-reset-btns").css("visibility", "visible")
         //     $("#downloadBtn").prop("href", `/${jsonResponse["job_id"]}`)
         // })
-        
-        // .catch(exc => {
-        //     showAlert("danger", 10000, null, exc.message)
-        //     $(".submitBtn").css("visibility", "visible")
-        //     $(".generatingBtn").css("visibility", "hidden")
-        // })
 
+        // Poll the status of the task every 5 seconds
+        const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+        const polling = (async() => {
+            while (true) {
+                const r = await fetch(`/task_status/${task_id}`, {
+                    method: "POST",
+                })
+                const status = await r.json()
+                if (status["state"] == "SUCCESS") {
+                    $(".generatingBtn").css("visibility", "hidden")
+                    showAlert("success", 10000, noConfs, null)
+                    $(".download-reset-btns").css("visibility", "visible")
+                    $("#downloadBtn").prop("href", `/${uniq_id}`)
+                    break
+                } 
+                // else if (status["state"] == "FAILURE") {
+                    // ...reload page
+                    // ..error alert
+                    // break
+                // } 
+                else {
+                    await timeout(5000)
+                }
+            }
+        })()
+        
     }
 
     if (smiles) {
-        hideSubmitBtn()
+        asyncSubmit()
     }
     else if (allowedExtensions.includes(molFile.split(".").pop())) {
-        hideSubmitBtn()
+        asyncSubmit()
     }
     else {
         e.preventDefault()
-        showAlert("danger", 5000, null)
+        showAlert("danger", 10000, null)
     }
 })
-
-
-// Polling status
-
-
-// Checks if download button is available on the DOM
-// if ($("#downloadBtn").length) {
-//     const noConfs = $("#downloadBtn").prop("href").split("=").slice(-1).toString()
-//     showAlert("success", 5000, noConfs, null)
-// }
-
-
 
 function showAlert(type, duration, noConfs) {
     const alertFade = $(`.alerts .alert-${type}`)

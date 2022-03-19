@@ -71,6 +71,10 @@ video {
     visibility: hidden;
 }
 
+.download-reset-btns {
+    visibility: hidden;
+}
+
 .alerts {
     display: grid;
     margin-top: 10px;
@@ -89,7 +93,7 @@ video {
 
 .alert-message-slideIn {
     animation-name: slideIn;
-    animation-duration: 0.3s;
+    animation-duration: 0.25s;
     animation-timing-function: ease-out;
     animation-direction: forwards;
 }
@@ -107,7 +111,7 @@ video {
     }
 
     100% {
-        transform: skewX(21deg);
+        transform: skewX(10deg);
     }
 }
 
@@ -117,7 +121,7 @@ video {
     }
 
     100% {
-        transform: skewX(21deg);
+        transform: skewX(10deg);
     }
 }
 

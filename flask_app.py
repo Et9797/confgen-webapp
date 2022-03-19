@@ -120,36 +120,27 @@ def form_handler():
                 return render_template("index.html", error="NIH")
         
         # Generate conformers
-        gen_confs.delay(smiles, mol_file.filename, mol_path, no_conformers, 
-                        output_ext, output_separate).wait() 
-
-        # return jsonify({"job_id": unique_id})
-        return render_template("index.html", job_id=unique_id, noConfs=no_conformers)
+        task = gen_confs.delay(smiles, mol_file.filename, mol_path, no_conformers, 
+                        output_ext, output_separate)
+        
+        return jsonify({"uniq_id": unique_id, "task_id": task.id})
 
 @celery.task()
 def gen_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, output_seperate):
-    try:
-        if smiles:
-            conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
-        else:
-            conformers = confgen_rdkit.generate_conformers(os.path.join(mol_path, mol_filename), 
-                                                           no_conformers=no_conformers)
-        confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_seperate)
-    except Exception as e:
-        app.logger.error(traceback.format_exc())
-        return redirect(url_for("index"))
+    if smiles:
+        conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
+    else:
+        conformers = confgen_rdkit.generate_conformers(os.path.join(mol_path, mol_filename), 
+                                                       no_conformers=no_conformers)
+    confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_seperate)
 
-    return {"status": True}
+@app.route("/task_status/<task_id>", methods=["POST", "GET"])
+def task_status(task_id):
+    if request.method == "POST":
+        status = celery.AsyncResult(task_id).state
+        return jsonify({"state": status})
 
-# @celery.task()
-# def task_error():
-#     print("error occurred")
-#     #redirecturl..
-#     # refresh de page...
-
-# def task_status():
-#     pass
-
+#handling error ook met polling
 
 if __name__ == "__main__":
     app.run(debug=True)

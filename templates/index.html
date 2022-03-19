@@ -23,11 +23,9 @@
             RDKit [1] uses the ETKDG method to generate a collection of diverse low energy conformers. Generation may 
             take a while depending on how many conformers are being generated. Specifically intended for small-molecules, 
             not proteins (look into molecular dynamics for that). Avoid ambiguities in the PDB file, primarily in the atom name 
-            column and the last atom column. Uses Knodle [2] for assigning bond orders of ligands provided as PDB format. 
-            Caution is required when providing ligands in PDB format, as Knodle can make errors and fail to assign correct bond orders. 
-            It is advised to use SDF/Mol/Mol2 or preferably SMILES for more complex small molecules.
+            column and the last atom column. Caution is warranted when providing ligands in PDB format, as the conversion is prone to 
+            errors and may yield incorrectly assigned bond orders. It is advised to use SDF/Mol or preferably SMILES for relatively larger molecules.
             <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a></p>
-            <p style="margin-top: 10px;">[2] <a href="https://team.inria.fr/nano-d/software/knodle/" target="_blank"> https://team.inria.fr/nano-d/software/knodle/</a></p>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -143,16 +141,10 @@
               <span class="spinner-grow spinner-grow-sm" role="status"></span>
               Generating...
             </button>
-            {% if job_id %}
-            <script>
-              const submitBtn = document.querySelector(".submitBtn")
-              submitBtn.remove()
-            </script>
             <div class="d-flex justify-content-center align-items-end download-reset-btns gap-2">
-              <a href="{{ url_for('serve_files', job_id=job_id) }}" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
+              <a href="" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
               <a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning resetBtn" type="button" style="color: white;">Reset</button></a>
             </div>
-            {% endif %}
           </div>
         </form>
         <div class="alerts-container align-self-center">
