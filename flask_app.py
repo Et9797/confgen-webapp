@@ -140,7 +140,6 @@ def task_status(task_id):
         status = celery.AsyncResult(task_id).state
         return jsonify({"state": status})
 
-#handling error ook met polling
 
 if __name__ == "__main__":
     app.run(debug=True)

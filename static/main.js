@@ -48,15 +48,6 @@ $("#main-form").on("submit", (e) => {
         const uniq_id = rJSON["uniq_id"]
         const task_id = rJSON["task_id"]
         
-        // .then(jsonResponse => {
-        //     // Download button
-        //     $(".generatingBtn").css("visibility", "hidden")
-        //     $(".submitBtn").css("visibility", "hidden")
-        //     showAlert("success", 5000, noConfs, null)
-        //     $(".download-reset-btns").css("visibility", "visible")
-        //     $("#downloadBtn").prop("href", `/${jsonResponse["job_id"]}`)
-        // })
-
         // Poll the status of the task every 5 seconds
         const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
         const polling = (async() => {
@@ -67,22 +58,20 @@ $("#main-form").on("submit", (e) => {
                 const status = await r.json()
                 if (status["state"] == "SUCCESS") {
                     $(".generatingBtn").css("visibility", "hidden")
-                    showAlert("success", 10000, noConfs, null)
+                    showAlert("success", 10000, noConfs)
                     $(".download-reset-btns").css("visibility", "visible")
                     $("#downloadBtn").prop("href", `/${uniq_id}`)
                     break
-                } 
-                // else if (status["state"] == "FAILURE") {
-                    // ...reload page
-                    // ..error alert
-                    // break
-                // } 
-                else {
+                } else if (status["state"] == "FAILURE") {
+                    $(".generatingBtn").css("visibility", "hidden")
+                    $(".submitBtn").css("visibility", "visible")
+                    showAlert("danger", 10000, null)
+                    break
+                } else {
                     await timeout(5000)
                 }
             }
         })()
-        
     }
 
     if (smiles) {
