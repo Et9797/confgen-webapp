@@ -21,7 +21,6 @@ app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # No caching of served conformer fil
 app.config.update(
     CELERY_BACKEND_URL='redis://localhost:6379/0',
     CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_ACCEPT_CONTENT = ['pickle', 'application/json']
 )
 celery = tasks.make_celery(app)
 
@@ -116,7 +115,7 @@ def form_handler():
                 smiles = pdb_to_smiles.convert(os.path.join(mol_path, mol_file.filename))
             except Exception as e:
                 app.logger.error(traceback.format_exc())
-                return render_template("index.html", error="NIH")
+                return render_template("index.html")
         
         # Generate conformers
         task = gen_confs.delay(smiles, mol_file.filename, mol_path, no_conformers, 
@@ -141,4 +140,4 @@ def task_status(task_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
