@@ -20,7 +20,11 @@ app.config["MOLECULE_UPLOADS"] = MOLECULE_UPLOADS
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # No caching of served conformer files
 app.config.update(
     CELERY_BACKEND_URL='redis://localhost:6379/0',
+<<<<<<< HEAD
     CELERY_BROKER_URL='redis://localhost:6379/0',
+=======
+    CELERY_BROKER_URL='redis://localhost:6379',
+>>>>>>> 617a4ca0b072ea11cfc6a04c947653e03e2f10a1
 )
 celery = tasks.make_celery(app)
 
@@ -115,7 +119,11 @@ def form_handler():
                 smiles = pdb_to_smiles.convert(os.path.join(mol_path, mol_file.filename))
             except Exception as e:
                 app.logger.error(traceback.format_exc())
+<<<<<<< HEAD
                 return redirect(url_for('index'))
+=======
+                return render_template("index.html")
+>>>>>>> 617a4ca0b072ea11cfc6a04c947653e03e2f10a1
         
         # Generate conformers
         task = gen_confs.delay(smiles, mol_file.filename, mol_path, no_conformers, 
