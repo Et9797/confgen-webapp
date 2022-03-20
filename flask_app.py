@@ -10,8 +10,8 @@ from flask_mail import Mail, Message
 import logging
 import tasks
 
-BASE_DIR = '/home/et/personal_projects/confgen-webapp/'
-MOLECULE_UPLOADS = '/home/et/personal_projects/confgen-webapp/MOLECULE_UPLOADS/'
+BASE_DIR = '/var/www/html/confgen-webapp/'
+MOLECULE_UPLOADS = '/var/www/html/confgen-webapp/MOLECULE_UPLOADS/'
 
 # Flask & Celery setup
 app = Flask(__name__)
@@ -20,14 +20,13 @@ app.config["MOLECULE_UPLOADS"] = MOLECULE_UPLOADS
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 # No caching of served conformer files
 app.config.update(
     CELERY_BACKEND_URL='redis://localhost:6379/0',
-    CELERY_BROKER_URL='redis://localhost:6379',
-    CELERY_ACCEPT_CONTENT = ['pickle', 'application/json']
+    CELERY_BROKER_URL='redis://localhost:6379/0',
 )
 celery = tasks.make_celery(app)
 
 # Logging
 app.logger.setLevel(logging.INFO)
-fh = logging.FileHandler("appLog.log")
+fh = logging.FileHandler("/var/www/html/confgen-webapp/appLog.log")
 formatter = logging.Formatter('[%(asctime)s] - %(name)s - %(levelname)s - %(message)s', datefmt='%d-%m-%Y %H:%M:%S')
 fh.setFormatter(formatter)
 app.logger.addHandler(fh)
@@ -116,7 +115,7 @@ def form_handler():
                 smiles = pdb_to_smiles.convert(os.path.join(mol_path, mol_file.filename))
             except Exception as e:
                 app.logger.error(traceback.format_exc())
-                return render_template("index.html", error="NIH")
+                return redirect(url_for('index'))
         
         # Generate conformers
         task = gen_confs.delay(smiles, mol_file.filename, mol_path, no_conformers, 
@@ -141,4 +140,4 @@ def task_status(task_id):
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
