@@ -13,16 +13,16 @@ $("#contact-form").on("submit", (e) => {
     })
 })
 
-// mol ext can only be in seperate files
+// mol ext can only be in separate files
 $("#molRadio").on("click", () => {
-    $("#seperateFiles").prop("checked", true)
-    $("#seperateFiles").attr("onclick", 'return false;')
-    $("#seperateFiles").attr("onkeydown", 'return false;')
+    $("#separateFiles").prop("checked", true)
+    $("#separateFiles").attr("onclick", 'return false;')
+    $("#separateFiles").attr("onkeydown", 'return false;')
 })
 
 $("#pdbRadio, #sdfRadio").on("click", () => {
-    $("#seperateFiles").attr("onclick", '')
-    $("#seperateFiles").attr("onkeydown", '')
+    $("#separateFiles").attr("onclick", '')
+    $("#separateFiles").attr("onkeydown", '')
 })
 
 // On form submit
@@ -53,7 +53,7 @@ $("#main-form").on("submit", (e) => {
         const polling = (async() => {
             while (true) {
                 const r = await fetch(`/task_status/${task_id}`, {
-                    method: "POST",
+                    method: "GET"
                 })
                 const status = await r.json()
                 if (status["state"] == "SUCCESS") {

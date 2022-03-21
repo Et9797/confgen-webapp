@@ -9,6 +9,7 @@ from flask import Flask, render_template, request, redirect, url_for, send_file,
 from flask_mail import Mail, Message
 import logging
 import tasks
+import config
 
 BASE_DIR = '/var/www/html/confgen-webapp/'
 MOLECULE_UPLOADS = '/var/www/html/confgen-webapp/MOLECULE_UPLOADS/'
@@ -36,8 +37,8 @@ app.config["MAIL_SERVER"] = "smtp-mail.outlook.com"
 app.config["MAIL_PORT"] = 587
 app.config["MAIL_USE_TLS"] = True
 app.config["MAIL_USE_SSL"] = False
-app.config["MAIL_USERNAME"] = os.environ.get("EMAIL")
-app.config["MAIL_PASSWORD"] = os.environ.get("EMAIL_PASS")
+app.config["MAIL_USERNAME"] = config.email
+app.config["MAIL_PASSWORD"] = config.passw
 mail = Mail(app)
 
 @app.route("/contact", methods=["POST","GET"])
@@ -124,19 +125,18 @@ def form_handler():
         return jsonify({"uniq_id": unique_id, "task_id": task.id})
 
 @celery.task()
-def gen_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, output_seperate):
+def gen_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, output_separate):
     if smiles:
         conformers = confgen_rdkit.generate_conformers(smiles, no_conformers=no_conformers)
     else:
         conformers = confgen_rdkit.generate_conformers(os.path.join(mol_path, mol_filename), 
                                                        no_conformers=no_conformers)
-    confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_seperate)
+    confgen_rdkit.write_confs_to_file(conformers, mol_path, output_ext, output_separate)
 
-@app.route("/task_status/<task_id>", methods=["POST", "GET"])
+@app.route("/task_status/<task_id>")
 def task_status(task_id):
-    if request.method == "POST":
-        status = celery.AsyncResult(task_id).state
-        return jsonify({"state": status})
+    status = celery.AsyncResult(task_id).state
+    return jsonify({"state": status})
 
 
 if __name__ == "__main__":
