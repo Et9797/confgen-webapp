@@ -48,7 +48,7 @@ $("#main-form").on("submit", (e) => {
         const uniq_id = rJSON["uniq_id"]
         const task_id = rJSON["task_id"]
         
-        // // Poll the status of the task every 5 seconds
+        // Poll the status of the task every 5 seconds
         const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
         const polling = (async() => {
             while (true) {
@@ -85,7 +85,7 @@ $("#main-form").on("submit", (e) => {
     }
 })
 
-async function showAlert(type, noConfs) {
+function showAlert(type, noConfs) {
     const alertFade = $(`.alerts .alert-${type}`)
     alertFade.empty()
     if (type == "success") {
