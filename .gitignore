@@ -1,12 +1,6 @@
 __pycache__/
 env/
-wsgi.py
-config.py
-error.log
-log.txt
-molecules.txt
-scheduler.sh
 test/
 appLog.log
-test_molecules/
 confgen.wsgi
+_email.py
