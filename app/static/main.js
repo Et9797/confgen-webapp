@@ -99,6 +99,6 @@ function showAlert(type, noConfs, duration) {
         alertFade.addClass("fadeOutAlert")
         setTimeout(() => {
             alertFade.removeClass("fadeOutAlert")
-        }, 750)
+        }, 500)
     }, duration)
 }
