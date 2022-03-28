@@ -58,14 +58,14 @@ $("#main-form").on("submit", (e) => {
                 const status = await r.json()
                 if (status["state"] == "SUCCESS") {
                     $(".generatingBtn").css("visibility", "hidden")
-                    showAlert("success", noConfs)
+                    showAlert("success", noConfs, 10000)
                     $(".download-reset-btns").css("visibility", "visible")
                     $("#downloadBtn").prop("href", `/${uniq_id}`)
                     break
                 } else if (status["state"] == "FAILURE") {
                     $(".generatingBtn").css("visibility", "hidden")
                     $(".submitBtn").css("visibility", "visible")
-                    showAlert("danger", null)
+                    showAlert("danger", null, 7000)
                     break
                 } 
                 await timeout(5000)
@@ -81,22 +81,24 @@ $("#main-form").on("submit", (e) => {
     }
     else {
         e.preventDefault()
-        showAlert("danger", 10000, null)
+        showAlert("danger", null, 7000)
     }
 })
 
-function showAlert(type, noConfs) {
+function showAlert(type, noConfs, duration) {
     const alertFade = $(`.alerts .alert-${type}`)
     alertFade.empty()
     if (type == "success") {
         alertFade.append(`<i class="fas fa-check"></i> Successfully generated ${noConfs} conformers.`)
-        alertFade.fadeIn("slow")
-        alertFade.delay(10000)
-        alertFade.fadeOut("slow")
     } else if (type == "danger") {
         alertFade.append(`<i class="fas fa-times"></i> Something went wrong in RDKit. Check if the provided file or SMILES is correct.`) 
-        alertFade.fadeIn("slow")
-        alertFade.delay(5000)
-        alertFade.fadeOut("slow")
     }
+    alertFade.addClass("fadeInAlert")
+    setTimeout(() => {
+        alertFade.removeClass("fadeInAlert")
+        alertFade.addClass("fadeOutAlert")
+        setTimeout(() => {
+            alertFade.removeClass("fadeOutAlert")
+        }, 750)
+    }, duration)
 }
