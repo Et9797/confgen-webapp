@@ -81,7 +81,7 @@ $("#main-form").on("submit", (e) => {
     }
     else {
         e.preventDefault()
-        showAlert("danger", 10000, null)
+        showAlert("danger", null)
     }
 })
 
