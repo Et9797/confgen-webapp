@@ -92,11 +92,11 @@ video {
 }
 
 .fadeInAlert {
-    animation: fadein 750ms ease forwards;
+    animation: fadein 500ms ease forwards;
 }
 
 .fadeOutAlert {
-    animation: fadeout 750ms ease forwards;
+    animation: fadeout 500ms ease forwards;
 }
 
 /* Download & Reset buttons */
