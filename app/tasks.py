@@ -1,6 +1,6 @@
 import os
 from app import make_celery, app
-from app._rdkit import pdb_to_smiles, confgen
+from ._rdkit import pdb_to_smiles, confgen
 
 celery = make_celery(app)
 
