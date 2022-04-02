@@ -4,4 +4,3 @@ test/
 appLog.log
 confgen.wsgi
 _email.py
-confgen.wsgi

@@ -4,7 +4,7 @@ import io
 import os
 import zipfile
 import uuid
-from app.tasks import celery, generate_confs
+from .tasks import celery, generate_confs
 
 @app.route("/contact", methods=["POST"])
 def contact():
@@ -16,7 +16,7 @@ def contact():
                       )
         mail.send(msg)
         return ('', 204)
-    
+
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -36,7 +36,8 @@ def serve_files(uniq_id):
                              cache_timeout=0
                              )
         else:
-            zipfolder = zipfile.ZipFile(os.path.join(mol_path, "Conformers.zip"), "w", zipfile.ZIP_STORED)
+            zipfolder = zipfile.ZipFile(os.path.join(mol_path, "Conformers.zip"), 
+                                        "w", zipfile.ZIP_STORED)
             for f in os.listdir(mol_path):
                 if f.startswith("conformer_"):
                     zipfolder.write(os.path.join(mol_path, f), f)
@@ -66,7 +67,8 @@ def form_handler():
 
         # Log form data 
         app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}," 
-                        f" N_conformers: {no_conformers}, Output: {output_ext}, Merged: {output_separate}"
+                        f" N_conformers: {no_conformers}, Output: {output_ext},"
+                        f" Output separate: {output_separate}"
                         )
 
         # Create folder to store conformers
