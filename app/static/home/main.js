@@ -70,7 +70,7 @@ $("#main-form").on("submit", (e) => {
                     showAlert("danger", null, 7000)
                     break
                 } 
-                await timeout(1000)
+                await timeout(500)
             }
         })()
     }
