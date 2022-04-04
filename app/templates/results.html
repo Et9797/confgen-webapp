@@ -7,8 +7,8 @@
 {% block content %} 
 <div class="container">
 	<div class="d-flex flex-column main-container">
-		<h1 id="generating">Generating</h1><hr>
-		<h6>You will be notified (via mail) once the job is completed.</h6>
+		<h1 id="generating" style="margin-bottom: 30px;">Generating</h1> <br> 
+		<h6 id="notification">You will be notified shortly (via mail) once the job is completed.</h6>
 		<div id="finished">
 			<h1>Finished
 				<svg class="checkmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
@@ -18,7 +18,7 @@
 			</h1>
 			<div id="download-reset-btns">
 				<a href="" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
-				<a href="{{ url_for('index') }}" id="resetBtn"><button class="btn btn-warning" type="button" style="color: white;">Reset</button></a>
+				<a href="{{ url_for('index') }}"><button class="btn btn-warning" type="button" style="color:white;">Reset</button></a>
 			</div>
 		</div>
 		<div id="error">
@@ -29,14 +29,14 @@
 					<path class="cross__path cross__path--left addClass" fill="none" d="M16,36 l20,-20" />
 				</svg>
 			</h1>
-			<p>An error occurred during generation. Check if the provided file or SMILES string is correct. Error log:</p>
-			<!-- jinja {} en error in bootstrap rood alert-->
+			<p>An error occurred during generation. Check if the provided file or SMILES string is correct.</p>
+			<a href="{{ url_for('index') }}"><button class="btn btn-warning resetBtn" type="button" style="color:white;">Reset</button></a>
 		</div>
+		<footer class="footer-bottom">
+			Made with Flask & Bootstrap.
+		</footer>
 	</div>
 </div>
-
-
-<!-- video -->
 {% endblock %}
 
 {% block js %}

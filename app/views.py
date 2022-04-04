@@ -1,5 +1,5 @@
 from app import app, mail, Message
-from flask import render_template, request, send_file, jsonify
+from flask import render_template, redirect, url_for, request, send_file, jsonify
 import io
 from pathlib import Path
 import zipfile
@@ -60,47 +60,55 @@ def form_handler():
         mol_file = request.files["molFile"]
         no_conformers = int(request.form["noConfs"])
         output_ext = request.form["outputFormat"]
+        email_address = request.form["emailAddress"]
         try:
             output_separate = request.form["separateFiles"]
         except:
             output_separate = "off"
-
+        
         # Log form data 
         app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}," 
                         f" N_conformers: {no_conformers}, Output: {output_ext},"
-                        f" Output separate: {output_separate}"
+                        f" OutputSeparate: {output_separate}, E-mail: {email_address}" 
                         )
 
+        return redirect(url_for("results", task_id=uniq_id))
         # Create folder to store conformers
-        mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
-        Path(mol_path).mkdir()
-        if not smiles:
-            # A file was provided
-            allowed_extensions = ["pdb", "sdf", "mol"]
-            extension = mol_file.filename.split(".")[-1]
-            assert extension in allowed_extensions
-            mol_file.save(Path(mol_path, mol_file.filename))
+        # mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
+        # Path(mol_path).mkdir()
+        # if not smiles:
+        #     # A file was provided
+        #     allowed_extensions = ["pdb", "sdf", "mol"]
+        #     extension = mol_file.filename.split(".")[-1]
+        #     assert extension in allowed_extensions
+        #     mol_file.save(Path(mol_path, mol_file.filename))
 
-        # Generate conformers
-        task = generate_confs.delay(smiles, mol_file.filename, mol_path,
-                                    no_conformers, output_ext, output_separate
-                                    )
+        # # Generate conformers
+        # task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
+        #                                           no_conformers, output_ext, output_separate],
+        #                                   task_id = uniq_id
+        #                                   )
+        
+        # #custom task id... nog kijken hoe file saven
+        # # return redirect(url_for('results', task_id=task.id))
+        # # return render template results html met vars uniq id en taskid
+        # return jsonify({"uniq_id": uniq_id, "task_id": task.id})
 
-        # if task.state == "Failure"
-        # flash -> error message...
-        # else
-        # return redirect(url_for('results', uniq_id))
-        # return render template results html met vars uniq id en taskid
-        return jsonify({"uniq_id": uniq_id, "task_id": task.id})
-    
 @app.route("/results")
 def results():
     args = request.args
+    if not args:
+        return ('', 404)
+    
+    # if Path(app.config["MOLECULE_UPLOADS"], args.get(task_id)).exists():
+    #     pass
+
     # if pathtotask-id folder exists..
     # else return 404
     print(args.get("task_id"))
     # pass
     return render_template("results.html")
+    # render template met vars args[task_id]
     # if uniq_id molpath exists..
     # if request.method == "GET":
     #     return render_template("results.html")

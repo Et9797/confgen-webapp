@@ -38,15 +38,10 @@ video {
 }
 
 #main-form {
-    border: 1px solid lightgrey;
+    border: 2px solid lightgrey;
     padding: 20px;
     border-radius: 15px;
-}
-
-.footer-bottom {
-    font-size: 9px;
-    align-self: center;
-    margin-top: auto;
+    box-shadow: 5px 5px 15px #888888
 }
 
 .submitBtnContainer {
@@ -56,6 +51,17 @@ video {
 
 .submitBtn {
     width: 15%;
+}
+
+.invalid-feedback {
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.footer-bottom {
+    font-size: 9px;
+    align-self: center;
+    margin-top: auto;
 }
 
 @media (min-width: 768px) {

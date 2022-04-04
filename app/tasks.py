@@ -1,11 +1,12 @@
 from pathlib import Path
-from app import make_celery, app
+from app import make_celery, app, mail, Message
 from ._rdkit import pdb_to_smiles, confgen
 
 celery = make_celery(app)
 
 @celery.task()
-def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, output_separate):
+def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, 
+                   output_separate, mail_address):
     # Generate conformers
     if smiles:
         conformers = confgen.generate_conformers(smiles, no_conformers=no_conformers)
@@ -18,3 +19,7 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, ou
                                                  )
     # Write conformers to disk
     confgen.write_confs_to_file(conformers, mol_path, output_ext, output_separate)
+
+    # Send mail to job page if one was provided
+    if mail_address:
+        pass
