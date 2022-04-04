@@ -37,5 +37,5 @@ def make_celery(app):
     celery.finalize()
     return celery
 
-
+# Import views
 from app import views

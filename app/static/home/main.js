@@ -33,8 +33,10 @@ $("#main-form").on("submit", (e) => {
     const smiles = Array.from(formData.entries())[1][1]
     const molFile = Array.from(formData.entries())[0][1]["name"]
     const noConfs = Array.from(formData.entries())[2][1]
-    
-    const asyncSubmit = async() => {
+   
+    // check de vals en dan mainform.trigger(submit)
+
+    const asyncSubmit = async () => {
         // Hide submit button, show generating button
         $(".submitBtn").css("visibility", "hidden")
         $(".generatingBtn").css("visibility", "visible")
@@ -50,7 +52,7 @@ $("#main-form").on("submit", (e) => {
         
         // Poll the status of the task every 5 seconds
         const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
-        const polling = (async() => {
+        const polling = (async () => {
             while (true) {
                 const r = await fetch(`/task_status/${task_id}`, {
                     method: "GET"
@@ -68,7 +70,7 @@ $("#main-form").on("submit", (e) => {
                     showAlert("danger", null, 7000)
                     break
                 } 
-                await timeout(5000)
+                await timeout(1000)
             }
         })()
     }

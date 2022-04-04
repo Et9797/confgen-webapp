@@ -1,0 +1,13 @@
+{% extends "index.html" %}
+
+{% block csslink %}
+<link rel="stylesheet" href="{{ url_for('static', filename='results/style.css') }}">
+{% endblock %}
+
+{% block content %} 
+<button class="btn btn-primary">press me</button>
+{% endblock %}
+
+{% block js %}
+<script src="{{ url_for('static', filename='results/results.js') }}"></script>
+{% endblock %}

@@ -1,7 +1,7 @@
 from app import app, mail, Message
 from flask import render_template, request, send_file, jsonify
 import io
-import os
+from pathlib import Path
 import zipfile
 import uuid
 from .tasks import celery, generate_confs
@@ -23,27 +23,27 @@ def index():
 
 @app.route("/<uniq_id>") 
 def serve_files(uniq_id): 
-    mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], uniq_id)
-    if os.path.exists(mol_path):
-        match = [f for f in os.listdir(mol_path) if f.startswith("ConformersMerged")]
+    mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
+    if Path(mol_path).exists():
+        match = [f for f in Path(mol_path).iterdir() if f.startswith("ConformersMerged")]
         if match:
             name_file = match[0]
             mol_mem = io.BytesIO()
-            with open(os.path.join(mol_path, name_file), "rb") as fo:
+            with open(Path(mol_path, name_file), "rb") as fo:
                 mol_mem.write(fo.read())
                 mol_mem.seek(0)
             return send_file(mol_mem, as_attachment=True, attachment_filename=name_file, 
                              cache_timeout=0
                              )
         else:
-            zipfolder = zipfile.ZipFile(os.path.join(mol_path, "Conformers.zip"), 
+            zipfolder = zipfile.ZipFile(Path(mol_path, "Conformers.zip"), 
                                         "w", zipfile.ZIP_STORED)
-            for f in os.listdir(mol_path):
+            for f in Path(mol_path).iterdir():
                 if f.startswith("conformer_"):
-                    zipfolder.write(os.path.join(mol_path, f), f)
+                    zipfolder.write(Path(mol_path, f), f)
             zipfolder.close()
             zip_mem = io.BytesIO()
-            with open(os.path.join(mol_path, zipfolder.filename), "rb") as fo:
+            with open(Path(mol_path, zipfolder.filename), "rb") as fo:
                 zip_mem.write(fo.read())
                 zip_mem.seek(0)
             return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
@@ -72,24 +72,43 @@ def form_handler():
                         )
 
         # Create folder to store conformers
-        mol_path = os.path.join(app.config["MOLECULE_UPLOADS"], uniq_id)
-        os.mkdir(mol_path)
+        mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
+        Path(mol_path).mkdir()
         if not smiles:
             # A file was provided
             allowed_extensions = ["pdb", "sdf", "mol"]
             extension = mol_file.filename.split(".")[-1]
             assert extension in allowed_extensions
-            mol_file.save(os.path.join(mol_path, mol_file.filename))
+            mol_file.save(Path(mol_path, mol_file.filename))
 
         # Generate conformers
-        task = generate_confs.delay(smiles, mol_file.filename, mol_path, no_conformers,
-                                    output_ext, output_separate
+        task = generate_confs.delay(smiles, mol_file.filename, mol_path,
+                                    no_conformers, output_ext, output_separate
                                     )
-        
+
+        # if task.state == "Failure"
+        # flash -> error message...
+        # else
+        # return redirect(url_for('results', uniq_id))
+        # return render template results html met vars uniq id en taskid
         return jsonify({"uniq_id": uniq_id, "task_id": task.id})
     
-    return ('', 404)
-
+@app.route("/results")
+def results():
+    args = request.args
+    # if pathtotask-id folder exists..
+    # else return 404
+    print(args.get("task_id"))
+    # pass
+    return render_template("results.html")
+    # if uniq_id molpath exists..
+    # if request.method == "GET":
+    #     return render_template("results.html")
+    # elif request.method == "POST":
+    #     # serve_files code 
+    #     pass
+    
+    
 @app.route("/task_status/<task_id>")
 def task_status(task_id):
     status = celery.AsyncResult(task_id).state
