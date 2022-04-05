@@ -33,12 +33,14 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext,
         
         # Send mail to user if one was provided
         if mail_address:
-            msg = Message(subject = "Conformer generation job completed.", 
-                          body = (f"Your job has been completed. URL for the results page:\n"
-                                  f"http://confgen.net/results?task_id={taskid}"
-                                  ),
-                          sender = app.config["MAIL_USERNAME"], 
-                          recipients = [mail_address]
-                        )
-            with app.app_context():
-                mail.send(msg)
+            try:
+                msg = Message(subject = "Conformer generation job completed.", 
+                            body = (f"Your job has been completed. URL for the results page:\n"
+                                    f"http://confgen.net/results?task_id={taskid}"
+                                    ),
+                            sender = app.config["MAIL_USERNAME"], 
+                            recipients = [mail_address]
+                            )
+                with app.app_context():
+                    mail.send(msg)
+            except: pass # Recipient email address may not be valid -> ignore
