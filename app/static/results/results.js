@@ -9,7 +9,6 @@ $(document).ready(() => {
                 method: "GET"
             })
             const status = await r.json()
-            console.log(status);
             if (status["state"] == "SUCCESS") {
                 $("#generating, #notification").css("display", "none")
                 $("#finished").css("display", "flex")
