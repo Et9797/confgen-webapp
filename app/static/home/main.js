@@ -34,7 +34,7 @@ $("#main-form").on("submit", (e) => {
    
     if (smiles) {
         return true
-    }
+    } 
     else if (allowedExtensions.includes(molFile.split(".").pop())) {
         return true
     }

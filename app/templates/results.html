@@ -17,7 +17,7 @@
 				</svg>
 			</h1>
 			<div id="download-reset-btns">
-				<a href="" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
+				<a href="{{ url_for('serve_files', task_id=task_id) }}" id="downloadBtn"><button class="btn btn-success" type="button">Download</button></a>
 				<a href="{{ url_for('index') }}"><button class="btn btn-warning" type="button" style="color:white;">Reset</button></a>
 			</div>
 		</div>
@@ -29,7 +29,8 @@
 					<path class="cross__path cross__path--left addClass" fill="none" d="M16,36 l20,-20" />
 				</svg>
 			</h1>
-			<p>An error occurred during generation. Check if the provided file or SMILES string is correct.</p>
+			<p>An error occurred during generation. Check if the provided file or SMILES string is correct. Error log:</p>
+			<div class="alert alert-danger error-message"></div>
 			<a href="{{ url_for('index') }}"><button class="btn btn-warning resetBtn" type="button" style="color:white;">Reset</button></a>
 		</div>
 		<footer class="footer-bottom">

@@ -1,6 +1,7 @@
 from rdkit import Chem
 from rdkit.Chem import AllChem
 import os
+Chem.WrapLogs()
 
 def generate_conformers(path_to_molecule, no_conformers):
 

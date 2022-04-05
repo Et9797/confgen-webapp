@@ -1,7 +1,9 @@
 from app import app, mail, Message
 from flask import render_template, redirect, url_for, request, send_file, jsonify
 import io
-from pathlib import Path
+from os.path import join as join_path
+from os.path import exists
+from os import mkdir, listdir
 import zipfile
 import uuid
 from .tasks import celery, generate_confs
@@ -21,36 +23,6 @@ def contact():
 def index():
     return render_template("index.html")
 
-@app.route("/<uniq_id>") 
-def serve_files(uniq_id): 
-    mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
-    if Path(mol_path).exists():
-        match = [f for f in Path(mol_path).iterdir() if f.startswith("ConformersMerged")]
-        if match:
-            name_file = match[0]
-            mol_mem = io.BytesIO()
-            with open(Path(mol_path, name_file), "rb") as fo:
-                mol_mem.write(fo.read())
-                mol_mem.seek(0)
-            return send_file(mol_mem, as_attachment=True, attachment_filename=name_file, 
-                             cache_timeout=0
-                             )
-        else:
-            zipfolder = zipfile.ZipFile(Path(mol_path, "Conformers.zip"), 
-                                        "w", zipfile.ZIP_STORED)
-            for f in Path(mol_path).iterdir():
-                if f.startswith("conformer_"):
-                    zipfolder.write(Path(mol_path, f), f)
-            zipfolder.close()
-            zip_mem = io.BytesIO()
-            with open(Path(mol_path, zipfolder.filename), "rb") as fo:
-                zip_mem.write(fo.read())
-                zip_mem.seek(0)
-            return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
-                             attachment_filename="Conformers.zip", cache_timeout=0
-                             )
-    return ('', 404)
-
 @app.route("/generate", methods=["POST"])
 def form_handler():
     if request.method == "POST":
@@ -60,7 +32,7 @@ def form_handler():
         mol_file = request.files["molFile"]
         no_conformers = int(request.form["noConfs"])
         output_ext = request.form["outputFormat"]
-        email_address = request.form["emailAddress"]
+        mail_address = request.form["emailAddress"]
         try:
             output_separate = request.form["separateFiles"]
         except:
@@ -69,30 +41,27 @@ def form_handler():
         # Log form data 
         app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}," 
                         f" N_conformers: {no_conformers}, Output: {output_ext},"
-                        f" OutputSeparate: {output_separate}, E-mail: {email_address}" 
+                        f" OutputSeparate: {output_separate}, E-mail: {mail_address}" 
                         )
 
-        return redirect(url_for("results", task_id=uniq_id))
         # Create folder to store conformers
-        # mol_path = Path(app.config["MOLECULE_UPLOADS"], uniq_id)
-        # Path(mol_path).mkdir()
-        # if not smiles:
-        #     # A file was provided
-        #     allowed_extensions = ["pdb", "sdf", "mol"]
-        #     extension = mol_file.filename.split(".")[-1]
-        #     assert extension in allowed_extensions
-        #     mol_file.save(Path(mol_path, mol_file.filename))
+        mol_path = join_path(app.config["MOLECULE_UPLOADS"], uniq_id)
+        mkdir(mol_path)
+        if not smiles:
+            # A file was provided
+            allowed_extensions = ["pdb", "sdf", "mol"]
+            extension = mol_file.filename.split(".")[-1]
+            assert extension in allowed_extensions
+            mol_file.save(join_path(mol_path, mol_file.filename))
 
         # # Generate conformers
-        # task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
-        #                                           no_conformers, output_ext, output_separate],
-        #                                   task_id = uniq_id
-        #                                   )
+        task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
+                                                  no_conformers, output_ext, output_separate,
+                                                  mail_address],
+                                          task_id = uniq_id
+                                          )
         
-        # #custom task id... nog kijken hoe file saven
-        # # return redirect(url_for('results', task_id=task.id))
-        # # return render template results html met vars uniq id en taskid
-        # return jsonify({"uniq_id": uniq_id, "task_id": task.id})
+        return redirect(url_for("results", task_id=task.id))
 
 @app.route("/results")
 def results():
@@ -100,24 +69,48 @@ def results():
     if not args:
         return ('', 404)
     
-    # if Path(app.config["MOLECULE_UPLOADS"], args.get(task_id)).exists():
-    #     pass
+    task_id = args.get("task_id")
+    if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
+        return render_template("results.html", task_id=task_id)
 
-    # if pathtotask-id folder exists..
-    # else return 404
-    print(args.get("task_id"))
-    # pass
-    return render_template("results.html")
-    # render template met vars args[task_id]
-    # if uniq_id molpath exists..
-    # if request.method == "GET":
-    #     return render_template("results.html")
-    # elif request.method == "POST":
-    #     # serve_files code 
-    #     pass
-    
-    
+    return ('', 404)
+
+@app.route("/results/<task_id>") 
+def serve_files(task_id): 
+    mol_path = join_path(app.config["MOLECULE_UPLOADS"], task_id)
+    if exists(mol_path):
+        match = [f for f in listdir(mol_path) if f.startswith("ConformersMerged")]
+        if match:
+            file_name = match[0]
+            mol_mem = io.BytesIO()
+            with open(join_path(mol_path, file_name), "rb") as fo:
+                mol_mem.write(fo.read())
+                mol_mem.seek(0)
+            return send_file(mol_mem, as_attachment=True, attachment_filename=file_name, 
+                             cache_timeout=0
+                             )
+        else:
+            zipfolder = zipfile.ZipFile(join_path(mol_path, "Conformers.zip"), 
+                                        "w", zipfile.ZIP_STORED)
+            for f in listdir(mol_path):
+                if f.startswith("conformer_"):
+                    zipfolder.write(join_path(mol_path, f), f)
+            zipfolder.close()
+            zip_mem = io.BytesIO()
+            with open(join_path(mol_path, zipfolder.filename), "rb") as fo:
+                zip_mem.write(fo.read())
+                zip_mem.seek(0)
+            return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
+                             attachment_filename="Conformers.zip", cache_timeout=0
+                             )
+    return ('', 404)
+
 @app.route("/task_status/<task_id>")
 def task_status(task_id):
     status = celery.AsyncResult(task_id).state
-    return jsonify({"state": status})
+    info = celery.AsyncResult(task_id).info
+    if info:
+        # Task has failed
+        status = "FAILURE"
+        
+    return jsonify({"state": status, "info": info})
