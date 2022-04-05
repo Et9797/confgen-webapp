@@ -57,7 +57,7 @@ def form_handler():
         # # Generate conformers
         task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
                                                   no_conformers, output_ext, output_separate,
-                                                  mail_address],
+                                                  mail_address, uniq_id],
                                           task_id = uniq_id
                                           )
         
@@ -112,5 +112,5 @@ def task_status(task_id):
     if info:
         # Task has failed
         status = "FAILURE"
-        
+
     return jsonify({"state": status, "info": info})

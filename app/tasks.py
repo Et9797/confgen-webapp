@@ -1,7 +1,6 @@
-from logging import exception
-from os.path import join as join_path
 from app import make_celery, app, mail, Message
 from ._rdkit import pdb_to_smiles, confgen
+from os.path import join as join_path
 from io import StringIO
 import sys
 
@@ -9,7 +8,7 @@ celery = make_celery(app)
 
 @celery.task()
 def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext, 
-                   output_separate, mail_address):
+                   output_separate, mail_address, taskid):
     # Generate conformers
     sio = sys.stderr = StringIO()
     exception_occurred = False
@@ -33,8 +32,13 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext,
             app.logger.warn(sio.getvalue())
         
         # Send mail to user if one was provided
-        # if mail_address:
-        #     pass
-        # with app.app_context():
-
-        #     mail.send(msg)
+        if mail_address:
+            msg = Message(subject = "Conformer generation job completed.", 
+                          body = (f"Your job has been completed. URL for the results page:\n"
+                                  f"http://confgen.net/results?task_id={taskid}"
+                                  ),
+                          sender = app.config["MAIL_USERNAME"], 
+                          recipients = [mail_address]
+                        )
+            with app.app_context():
+                mail.send(msg)
