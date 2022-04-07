@@ -13,8 +13,10 @@ def contact():
     if request.method == "POST":
         email = request.form["email"]
         message = request.form["message"].strip()
-        msg = Message(subject = "Conformer Webapp", body = f"Email: {email} \n \n{message}",
-                      sender = app.config["MAIL_USERNAME"], recipients = [app.config["MAIL_USERNAME"]]
+        msg = Message(subject = "Conformer Webapp", 
+                      body = f"Email: {email} \n \n{message}",
+                      sender = app.config["MAIL_USERNAME"], 
+                      recipients = [app.config["MAIL_USERNAME"]]
                       )
         mail.send(msg)
         return ('', 204)
@@ -35,13 +37,13 @@ def form_handler():
         mail_address = request.form["emailAddress"]
         try:
             output_separate = request.form["separateFiles"]
-        except:
+        except KeyError:
             output_separate = "off"
         
         # Log form data 
-        app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}," 
-                        f" N_conformers: {no_conformers}, Output: {output_ext},"
-                        f" OutputSeparate: {output_separate}, E-mail: {mail_address}" 
+        app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}, " 
+                        f"N_conformers: {no_conformers}, Output: {output_ext}, "
+                        f"OutputSeparate: {output_separate}, E-mail: {mail_address}" 
                         )
 
         # Create folder to store conformers
@@ -54,7 +56,7 @@ def form_handler():
             assert extension in allowed_extensions
             mol_file.save(join_path(mol_path, mol_file.filename))
 
-        # # Generate conformers
+        # Generate conformers
         task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
                                                   no_conformers, output_ext, output_separate,
                                                   mail_address, uniq_id],
@@ -110,7 +112,7 @@ def task_status(task_id):
     status = celery.AsyncResult(task_id).state
     info = celery.AsyncResult(task_id).info
     if info:
-        # Task has failed
+        # Task has failed and threw an error. When task is successful info = None
         status = "FAILURE"
 
     return jsonify({"state": status, "info": info})
