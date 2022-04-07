@@ -3,6 +3,7 @@ from ._rdkit import pdb_to_smiles, confgen
 from os.path import join as join_path
 from io import StringIO
 import sys
+from smtplib import SMTPRecipientsRefused
 
 celery = make_celery(app)
 
@@ -43,4 +44,4 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers, output_ext,
                             )
                 with app.app_context():
                     mail.send(msg)
-            except: pass # Recipient email address may not be valid -> ignore
+            except SMTPRecipientsRefused: pass # Recipient email address may not be valid -> ignore
