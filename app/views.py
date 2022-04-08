@@ -1,9 +1,9 @@
 from app import app, mail, Message
 from flask import render_template, redirect, url_for, request, send_file, jsonify
-import io
 from os.path import join as join_path
 from os.path import exists
 from os import mkdir, listdir
+import io
 import zipfile
 import uuid
 from .tasks import celery, generate_confs
@@ -13,12 +13,15 @@ def contact():
     if request.method == "POST":
         email = request.form["email"]
         message = request.form["message"].strip()
-        msg = Message(subject = "Conformer Webapp", 
-                      body = f"Email: {email} \n \n{message}",
-                      sender = app.config["MAIL_USERNAME"], 
-                      recipients = [app.config["MAIL_USERNAME"]]
-                      )
-        mail.send(msg)
+        msg = Message(
+            subject = "Conformer Webapp", 
+            body = f"Email: {email}\n\n{message}",
+            sender = app.config["MAIL_USERNAME"], 
+            recipients = [app.config["MAIL_USERNAME"]]
+        )
+        with app.app_context():
+            mail.send(msg)
+
         return ('', 204)
 
 @app.route("/")
@@ -41,10 +44,11 @@ def form_handler():
             output_separate = "off"
         
         # Log form data 
-        app.logger.info(f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}, " 
-                        f"N_conformers: {no_conformers}, Output: {output_ext}, "
-                        f"OutputSeparate: {output_separate}, E-mail: {mail_address}" 
-                        )
+        app.logger.info(
+            f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}, " 
+            f"N_conformers: {no_conformers}, Output: {output_ext}, "
+            f"OutputSeparate: {output_separate}, E-mail: {mail_address}"
+        )
 
         # Create folder to store conformers
         mol_path = join_path(app.config["MOLECULE_UPLOADS"], uniq_id)
@@ -57,20 +61,18 @@ def form_handler():
             mol_file.save(join_path(mol_path, mol_file.filename))
 
         # Generate conformers
-        task = generate_confs.apply_async(args = [smiles, mol_file.filename, mol_path,
-                                                  no_conformers, output_ext, output_separate,
-                                                  mail_address, uniq_id],
-                                          task_id = uniq_id
-                                          )
+        task = generate_confs.apply_async(
+            args = [smiles, mol_file.filename, mol_path, no_conformers, 
+                    output_ext, output_separate, mail_address, uniq_id
+                    ],
+            task_id = uniq_id
+        )
         
         return redirect(url_for("results", task_id=task.id))
 
 @app.route("/results")
 def results():
     args = request.args
-    if not args:
-        return ('', 404)
-    
     task_id = args.get("task_id")
     if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
         return render_template("results.html", task_id=task_id)
@@ -88,9 +90,12 @@ def serve_files(task_id):
             with open(join_path(mol_path, file_name), "rb") as fo:
                 mol_mem.write(fo.read())
                 mol_mem.seek(0)
-            return send_file(mol_mem, as_attachment=True, attachment_filename=file_name, 
-                             cache_timeout=0
-                             )
+            return send_file(
+                mol_mem, 
+                as_attachment=True,
+                attachment_filename=file_name, 
+                cache_timeout=0
+            )
         else:
             zipfolder = zipfile.ZipFile(join_path(mol_path, "Conformers.zip"), 
                                         "w", zipfile.ZIP_STORED)
@@ -102,9 +107,14 @@ def serve_files(task_id):
             with open(join_path(mol_path, zipfolder.filename), "rb") as fo:
                 zip_mem.write(fo.read())
                 zip_mem.seek(0)
-            return send_file(zip_mem, mimetype="application/zip", as_attachment=True, 
-                             attachment_filename="Conformers.zip", cache_timeout=0
-                             )
+            return send_file(
+                zip_mem, 
+                mimetype="application/zip", 
+                as_attachment=True, 
+                attachment_filename="Conformers.zip", 
+                cache_timeout=0
+            )
+            
     return ('', 404)
 
 @app.route("/task_status/<task_id>")

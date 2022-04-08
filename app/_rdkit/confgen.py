@@ -48,5 +48,4 @@ def write_confs_to_file(molecule, mol_path, output_ext, separate_files):
             sd_writer = Chem.SDWriter(join_path(mol_path, "ConformersMerged.sdf"))
             for cid in conf_ids:   
                 sd_writer.write(molecule, confId=cid)
-            sd_writer.close()
-                                                                                            
+            sd_writer.close()                                                                                        

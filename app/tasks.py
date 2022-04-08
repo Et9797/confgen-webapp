@@ -1,8 +1,8 @@
+import sys
 from app import make_celery, app, mail, Message
 from ._rdkit import pdb_to_smiles, confgen
 from os.path import join as join_path
 from io import StringIO
-import sys
 from smtplib import SMTPRecipientsRefused
 
 celery = make_celery(app)
@@ -21,9 +21,10 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers,
             smiles = pdb_to_smiles.convert(join_path(mol_path, mol_filename))
             conformers = confgen.generate_conformers(smiles, no_conformers=no_conformers)
         else:
-            conformers = confgen.generate_conformers(join_path(mol_path, mol_filename),
-                                                     no_conformers=no_conformers
-                                                     )
+            conformers = confgen.generate_conformers(
+                join_path(mol_path, mol_filename), 
+                no_conformers=no_conformers
+            )
     except:
         exception_occurred = True
         return sio.getvalue()
@@ -36,13 +37,15 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers,
         
         # Send mail to user if one was provided
         if mail_address:
-            msg = Message(subject = "Conformer generation job completed.", 
-                          body = (f"Your job has been completed. URL for the results page:\n"
-                                  f"http://confgen.net/results?task_id={taskid}"
-                                  ),
-                          sender = app.config["MAIL_USERNAME"], 
-                          recipients = [mail_address]
-                          )   
+            msg = Message(
+                subject = "Conformer generation job completed.", 
+                body = (
+                    f"Your job has been completed. URL for the results page:\n"
+                    f"http://confgen.net/results?task_id={taskid}"
+                ),
+                sender = app.config["MAIL_USERNAME"], 
+                recipients = [mail_address]
+            )   
             try:
                 with app.app_context():
                     mail.send(msg)
