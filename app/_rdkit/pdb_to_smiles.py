@@ -1,6 +1,7 @@
 import re
 import requests
 
+
 def convert(ligand_pdb):
     
     """Convert PDB to Smiles in order to assign bond orders"""

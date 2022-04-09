@@ -8,6 +8,7 @@ import zipfile
 import uuid
 from .tasks import celery, generate_confs
 
+
 @app.route("/contact", methods=["POST"])
 def contact():
     if request.method == "POST":
@@ -24,9 +25,11 @@ def contact():
 
         return ('', 204)
 
+
 @app.route("/")
 def index():
     return render_template("index.html")
+
 
 @app.route("/generate", methods=["POST"])
 def form_handler():
@@ -38,11 +41,8 @@ def form_handler():
         no_conformers = int(request.form["noConfs"])
         output_ext = request.form["outputFormat"]
         mail_address = request.form["emailAddress"]
-        try:
-            output_separate = request.form["separateFiles"]
-        except KeyError:
-            output_separate = "off"
-        
+        output_separate = request.form.get("separateFiles", "off")
+
         # Log form data 
         app.logger.info(
             f"ID: {uniq_id}, SMILES: {smiles}, MolFile: {mol_file.filename}, " 
@@ -70,6 +70,7 @@ def form_handler():
         
         return redirect(url_for("results", task_id=task.id))
 
+
 @app.route("/results")
 def results():
     args = request.args
@@ -78,6 +79,7 @@ def results():
         return render_template("results.html", task_id=task_id)
 
     return ('', 404)
+
 
 @app.route("/results/<task_id>") 
 def serve_files(task_id): 
@@ -116,6 +118,7 @@ def serve_files(task_id):
             )
             
     return ('', 404)
+
 
 @app.route("/task_status/<task_id>")
 def task_status(task_id):

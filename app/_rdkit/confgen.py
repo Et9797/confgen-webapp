@@ -3,6 +3,7 @@ from rdkit.Chem import AllChem
 from os.path import join as join_path
 Chem.WrapLogs()
 
+
 def generate_conformers(path_to_molecule, no_conformers):
 
     """Generates conformers for (crystal) ligand"""
@@ -19,6 +20,7 @@ def generate_conformers(path_to_molecule, no_conformers):
     AllChem.EmbedMultipleConfs(mol, no_conformers, clearConfs=True) #numThreads=0
 
     return mol
+
 
 def write_confs_to_file(molecule, mol_path, output_ext, separate_files):
 
