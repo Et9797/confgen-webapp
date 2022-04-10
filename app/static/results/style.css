@@ -7,14 +7,8 @@ h1 {
     font-size: 64px;
 }
 
-.fa-check {
-    font-size: 64px;
-    color: green;
-}
-
-.fa-times {
-    font-size: 64px;
-    color: red;
+#generating {
+  margin-bottom: 30px;
 }
 
 #generating::before {
@@ -46,7 +40,7 @@ h1 {
 }
 
 #finished {
-    display: none;
+	display: flex;
     flex-direction: column;
     align-items: center;
 }
@@ -57,13 +51,17 @@ h1 {
 }
 
 #error {
-    display: none;
+	display: flex;
     flex-direction: column;
     align-items: center;
 }
 
 #error a {
     margin-top: 20px;
+}
+
+#error-message {
+	white-space: pre-line;
 }
 
 .btn-success, .btn-warning {

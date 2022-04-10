@@ -7,35 +7,13 @@
 {% block content %}
 <div class="container">
   <div class="d-flex flex-column main-container">
-    <h1 id="generating" style="margin-bottom: 30px;">Generating</h1> <br>
-    <h6 id="notification">You will be notified shortly (via mail) once the job is completed.</h6>
-    <div id="finished">
-      <h1>Finished
-        <svg class="checkmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-          <circle class="checkmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
-          <path class="checkmark__check addClass" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-        </svg>
-      </h1>
-      <div id="download-reset-btns">
-        <a href="{{ url_for('serve_files', task_id=task_id) }}" id="downloadBtn"><button class="btn btn-success"
-            type="button">Download</button></a>
-        <a href="{{ url_for('index') }}"><button class="btn btn-warning" type="button"
-            style="color:white;">Reset</button></a>
-      </div>
-    </div>
-    <div id="error">
-      <h1>Something went wrong
-        <svg class="crossmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-          <circle class="crossmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
-          <path class="cross__path cross__path--right addClass" fill="none" d="M16,16 l20,20" />
-          <path class="cross__path cross__path--left addClass" fill="none" d="M16,36 l20,-20" />
-        </svg>
-      </h1>
-      <p>An error occurred during generation. Check if the provided file or SMILES string is correct. Error log:</p>
-      <div class="alert alert-danger error-message"></div>
-      <a href="{{ url_for('index') }}"><button class="btn btn-warning resetBtn" type="button"
-          style="color:white;">Reset</button></a>
-    </div>
+    {% block success %}{% endblock %}
+    {% block failure %}{% endblock %}
+    {% block generating %}
+    <h1 id="generating">Generating</h1> <br>
+    <h6 id="notification">Your job will finish shortly. An e-mail will be sent upon completion
+       if provided (check the junk folder).</h6>
+    {% endblock %}
     <footer class="footer-bottom">
       Made with Flask & Bootstrap.
     </footer>

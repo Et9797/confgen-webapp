@@ -1,0 +1,26 @@
+{% extends "results.html" %}
+
+{% block success %}
+<div id="finished">
+  <h1>Finished
+    <svg class="checkmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="checkmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
+      <path class="checkmark__check addClass" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+    </svg>
+  </h1>
+  <div id="download-reset-btns">
+    <a href="{{ url_for('serve_files', task_id=task_id) }}" id="downloadBtn"><button class="btn btn-success"
+        type="button">Download</button></a>
+    <a href="{{ url_for('index') }}"><button class="btn btn-warning" type="button"
+        style="color:white;">Reset</button></a>
+  </div>
+</div>
+{% endblock %}
+
+{% block generating %}{% endblock %}
+
+{% block js %}
+<script>
+  $(".addClass").toggleClass("animateElement")
+</script>
+{% endblock %}

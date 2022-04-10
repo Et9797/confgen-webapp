@@ -1,0 +1,27 @@
+{% extends "results.html" %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='results/style.css') }}">
+
+{% block failure %}
+<div id="error">
+  <h1>Something went wrong
+    <svg class="crossmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+      <circle class="crossmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
+      <path class="cross__path cross__path--right addClass" fill="none" d="M16,16 l20,20" />
+      <path class="cross__path cross__path--left addClass" fill="none" d="M16,36 l20,-20" />
+    </svg>
+  </h1>
+  <p>An error occurred during generation. Check if the provided file or SMILES string is correct. Error log:</p>
+  <div class="alert alert-danger" id="error-message"> {{ error_message }} </div>
+  <a href="{{ url_for('index') }}"><button class="btn btn-warning resetBtn" type="button"
+      style="color:white;">Reset</button></a>
+</div>
+{% endblock %}
+
+{% block generating %}{% endblock %}
+
+{% block js %}
+<script>
+  $(".addClass").toggleClass("animateElement")
+</script>
+{% endblock %}

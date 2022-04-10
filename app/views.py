@@ -76,12 +76,41 @@ def results():
     args = request.args
     task_id = args.get("task_id")
     if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
-        return render_template("results.html", task_id=task_id)
+        return render_template("results.html")
 
     return ('', 404)
 
 
-@app.route("/results/<task_id>") 
+@app.route("/task_status/<task_id>")
+def task_status(task_id):
+    status = celery.AsyncResult(task_id).state
+    info = celery.AsyncResult(task_id).info
+    if info:
+        # Task failed and threw an error. When task is successful info = None
+        return jsonify({"state": "FAILURE"})
+    if status == "SUCCESS":
+        return jsonify({"state": "SUCCESS"})
+
+    return jsonify({"state": "PENDING"})
+
+
+@app.route("/results/<task_id>")
+def results_outcome(task_id):
+    if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
+        args = request.args
+        job_status = args.get("job_status")
+        if job_status == "SUCCESS":
+            return render_template("success.html", task_id=task_id)
+        elif job_status == "FAILURE":
+            info = celery.AsyncResult(task_id).info
+            return render_template("failure.html", error_message=info)
+        else:
+            return redirect(url_for("index"))
+    
+    return ('', 404)
+
+
+@app.route("/results/job/<task_id>") 
 def serve_files(task_id): 
     mol_path = join_path(app.config["MOLECULE_UPLOADS"], task_id)
     if exists(mol_path):
@@ -99,7 +128,7 @@ def serve_files(task_id):
                 cache_timeout=0
             )
         else:
-            zipfolder = zipfile.ZipFile(join_path(mol_path, "Conformers.zip"), 
+            zipfolder = zipfile.ZipFile(join_path(mol_path, "Conformers.zip"),
                                         "w", zipfile.ZIP_STORED)
             for f in listdir(mol_path):
                 if f.startswith("conformer_"):
@@ -118,14 +147,3 @@ def serve_files(task_id):
             )
             
     return ('', 404)
-
-
-@app.route("/task_status/<task_id>")
-def task_status(task_id):
-    status = celery.AsyncResult(task_id).state
-    info = celery.AsyncResult(task_id).info
-    if info:
-        # Task has failed and threw an error. When task is successful info = None
-        status = "FAILURE"
-
-    return jsonify({"state": status, "info": info})

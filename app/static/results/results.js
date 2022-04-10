@@ -3,23 +3,21 @@ $(document).ready(() => {
     const timeout = (ms) => new Promise(resolve => setTimeout(resolve, ms))
     const polling = (async () => {
         const params = new URLSearchParams(window.location.search)
-        const taskID = params.get("task_id")
+        const TASK_ID = params.get("task_id")
         while (true) {
-            const r = await fetch(`/task_status/${taskID}`, {
+            const r = await fetch(`/task_status/${TASK_ID}`, {
                 method: "GET"
             })
             const status = await r.json()
-            if (status["state"] == "SUCCESS") {
-                $("#generating, #notification").css("display", "none")
-                $("#finished").css("display", "flex")
-                $(".addClass").toggleClass("animateElement")
-                break
-            } else if (status["state"] == "FAILURE") {
-                $("#generating, #notification").css("display", "none")
-                $("#error").css("display", "flex")
-                $(".addClass").toggleClass("animateElement")
-                $(".error-message").prop("innerText", status["info"])
-                break
+            switch (status["state"]) {
+                case "SUCCESS":
+                    window.location.replace(`/results/${TASK_ID}?job_status=SUCCESS`)
+                    break   
+                case "FAILURE":
+                    window.location.replace(`/results/${TASK_ID}?job_status=FAILURE`)
+                    break
+                default:
+                    break
             }
             await timeout(2000)
         }

@@ -5,24 +5,32 @@ from os.path import join as join_path
 from io import StringIO
 from smtplib import SMTPRecipientsRefused
 
+
 celery = make_celery(app)
+
 
 @celery.task()
 def generate_confs(smiles, mol_filename, mol_path, no_conformers, 
-                   output_ext, output_separate, mail_address, taskid):
+                   output_ext, output_separate, mail_address, task_id):
     # Capture stderr in case exception is thrown
     sio = sys.stderr = StringIO()
     exception_occurred = False
     try:
         # Generate conformers
         if smiles:
-            conformers = confgen.generate_conformers(smiles, no_conformers=no_conformers)
+            conformers = confgen.generate_conformers(
+                smiles,
+                no_conformers=no_conformers
+            )
         elif mol_filename.split(".")[-1] == 'pdb':
             smiles = pdb_to_smiles.convert(join_path(mol_path, mol_filename))
-            conformers = confgen.generate_conformers(smiles, no_conformers=no_conformers)
+            conformers = confgen.generate_conformers(
+                smiles,
+                no_conformers=no_conformers
+            )
         else:
             conformers = confgen.generate_conformers(
-                join_path(mol_path, mol_filename), 
+                join_path(mol_path, mol_filename),
                 no_conformers=no_conformers
             )
     except:
@@ -40,8 +48,9 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers,
             msg = Message(
                 subject = "Conformer generation job completed.", 
                 body = (
-                    f"Your job has been completed. URL for the results page:\n"
-                    f"http://confgen.net/results?task_id={taskid}"
+                    "Your job has been completed. URL for the results page:\n"
+                    f"http://confgen.net/results/{task_id}?job_status="
+                    f"{'FAILURE' if exception_occurred else 'SUCCESS'}"
                 ),
                 sender = app.config["MAIL_USERNAME"], 
                 recipients = [mail_address]
