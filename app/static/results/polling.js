@@ -9,15 +9,8 @@ $(document).ready(() => {
                 method: "GET"
             })
             const status = await r.json()
-            switch (status["state"]) {
-                case "SUCCESS":
-                    window.location.replace(`/results/${TASK_ID}?job_status=SUCCESS`)
-                    break   
-                case "FAILURE":
-                    window.location.replace(`/results/${TASK_ID}?job_status=FAILURE`)
-                    break
-                default:
-                    break
+            if (status["state"] != "PENDING") {
+                window.location.replace(`/results/${TASK_ID}`)
             }
             await timeout(2000)
         }

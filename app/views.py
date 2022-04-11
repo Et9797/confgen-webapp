@@ -73,8 +73,7 @@ def form_handler():
 
 @app.route("/results")
 def results():
-    args = request.args
-    task_id = args.get("task_id")
+    task_id = request.args.get("task_id")
     if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
         return render_template("results.html")
 
@@ -84,26 +83,19 @@ def results():
 @app.route("/task_status/<task_id>")
 def task_status(task_id):
     status = celery.AsyncResult(task_id).state
-    info = celery.AsyncResult(task_id).info
-    if info:
-        # Task failed and threw an error. When task is successful info = None
-        return jsonify({"state": "FAILURE"})
-    if status == "SUCCESS":
-        return jsonify({"state": "SUCCESS"})
-
-    return jsonify({"state": "PENDING"})
+    return jsonify({"state": status})
 
 
 @app.route("/results/<task_id>")
 def results_outcome(task_id):
     if exists(join_path(app.config["MOLECULE_UPLOADS"], task_id)):
-        args = request.args
-        job_status = args.get("job_status")
-        if job_status == "SUCCESS":
-            return render_template("success.html", task_id=task_id)
-        elif job_status == "FAILURE":
-            info = celery.AsyncResult(task_id).info
+        status = celery.AsyncResult(task_id).state
+        info = celery.AsyncResult(task_id).info
+        if info:
+            # Task failed and threw an error. When task is successful info = None
             return render_template("failure.html", error_message=info)
+        elif status == "SUCCESS":
+            return render_template("success.html", task_id=task_id)
         else:
             return redirect(url_for("index"))
     

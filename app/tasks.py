@@ -49,8 +49,7 @@ def generate_confs(smiles, mol_filename, mol_path, no_conformers,
                 subject = "Conformer generation job completed.", 
                 body = (
                     "Your job has been completed. URL for the results page:\n"
-                    f"http://confgen.net/results/{task_id}?job_status="
-                    f"{'FAILURE' if exception_occurred else 'SUCCESS'}"
+                    f"http://confgen.net/results/{task_id}"
                 ),
                 sender = app.config["MAIL_USERNAME"], 
                 recipients = [mail_address]
