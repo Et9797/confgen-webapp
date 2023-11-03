@@ -23,11 +23,12 @@
           </div>
           <div class="modal-body">
             <p>Small-molecule (ligand) conformer generation is usually performed prior to protein-ligand docking. 
-            RDKit [1] uses the ETKDG method to generate a collection of diverse low energy conformers. Generation may 
+            RDKit [1] uses the ETKDG method to generate a collection of diverse low-energy conformers. Generation may 
             take a while depending on how many conformers are being generated. Specifically intended for small-molecules, 
-            not proteins (look into molecular dynamics for that). Avoid ambiguities in the PDB file, primarily in the atom name 
+            not proteins (look into molecular dynamics). Avoid ambiguities in the PDB file, primarily in the atom name 
             column and the last atom column. Caution is warranted when providing ligands in PDB format, as the conversion is prone to 
-            errors and may yield incorrectly assigned bond orders. It is advised to use SDF/Mol or preferably SMILES for relatively larger molecules.
+            errors, and may yield incorrectly assigned bond orders. It is advised to use SDF/Mol or preferably SMILES representation
+            for relatively larger molecules.
             <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a></p>
           </div>
           <div class="modal-footer">

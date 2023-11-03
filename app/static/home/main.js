@@ -34,13 +34,10 @@ $("#main-form").on("submit", (e) => {
    
     if (smiles) {
         return true
-    } 
-    else if (allowedExtensions.includes(molFile.split(".").pop())) {
+    } else if (allowedExtensions.includes(molFile.split(".").pop())) {
         return true
-    }
-    else {
+    } else {
         e.preventDefault()
         $(".invalid-feedback").css("display", "flex").delay(5000).fadeOut("fast")
     }
-
 })

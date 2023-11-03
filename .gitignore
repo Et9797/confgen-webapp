@@ -1,6 +1,4 @@
-__pycache__/
-env/
-test/
-appLog.log
+**/__pycache__/
+.venv/
+confgen.log
 confgen.wsgi
-_email.py

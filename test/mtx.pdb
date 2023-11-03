@@ -1,0 +1,67 @@
+HETATM    1  N   MTX A2000      41.101 -45.349  -8.410  1.00 27.80      C    N  
+HETATM    2  CA  MTX A2000      42.251 -46.271  -8.373  1.00 31.31      C    C  
+HETATM    3  C   MTX A2000      41.187 -44.114  -8.837  1.00 25.96      C    C  
+HETATM    4  O   MTX A2000      42.336 -43.415  -9.086  1.00 25.24      C    O  
+HETATM    5  NA2 MTX A2000      29.088 -41.069  -5.058  1.00 18.19      C    N  
+HETATM    6  NA4 MTX A2000      30.147 -41.023  -9.614  1.00 15.63      C    N  
+HETATM    7  CB  MTX A2000      42.770 -46.601  -6.971  1.00 29.95      C    C  
+HETATM    8  CG  MTX A2000      43.208 -45.377  -6.252  1.00 27.94      C    C  
+HETATM    9  CD  MTX A2000      41.937 -44.876  -5.532  1.00 25.80      C    C  
+HETATM   10  OE1 MTX A2000      41.148 -45.670  -4.864  1.00 22.17      C    O  
+HETATM   11  OE2 MTX A2000      41.709 -43.645  -5.612  1.00 23.99      C    O  
+HETATM   12  CM  MTX A2000      36.565 -39.470  -9.284  1.00 17.26      C    C  
+HETATM   13  N1  MTX A2000      31.249 -41.008  -5.650  1.00 13.43      C    N  
+HETATM   14  O1  MTX A2000      42.752 -48.319  -9.368  1.00 38.46      C    O  
+HETATM   15  C2  MTX A2000      29.940 -41.030  -6.021  1.00 16.67      C    C  
+HETATM   16  O2  MTX A2000      40.643 -47.900  -9.186  1.00 35.32      C    O  
+HETATM   17  N3  MTX A2000      29.587 -41.085  -7.348  1.00 17.08      C    N  
+HETATM   18  C4  MTX A2000      30.548 -41.039  -8.276  1.00 15.62      C    C  
+HETATM   19  C4A MTX A2000      31.893 -41.071  -7.959  1.00 16.56      C    C  
+HETATM   20  N5  MTX A2000      32.876 -41.123  -8.968  1.00 14.85      C    N  
+HETATM   21  C6  MTX A2000      34.196 -41.203  -8.568  1.00 18.25      C    C  
+HETATM   22  C7  MTX A2000      34.503 -41.146  -7.180  1.00 19.42      C    C  
+HETATM   23  C8A MTX A2000      32.229 -41.031  -6.608  1.00 15.35      C    C  
+HETATM   24  N8  MTX A2000      33.536 -41.023  -6.165  1.00 17.40      C    N  
+HETATM   25  C9  MTX A2000      35.191 -41.371  -9.669  1.00 17.02      C    C  
+HETATM   26  N10 MTX A2000      36.479 -40.906  -9.352  1.00 14.52      C    N  
+HETATM   27  C11 MTX A2000      39.915 -43.269  -8.988  1.00 21.62      C    C  
+HETATM   28  C12 MTX A2000      38.677 -43.896  -9.129  1.00 21.64      C    C  
+HETATM   29  C13 MTX A2000      37.487 -43.079  -9.253  1.00 16.45      C    C  
+HETATM   30  C14 MTX A2000      37.668 -41.715  -9.207  1.00 14.79      C    C  
+HETATM   31  C15 MTX A2000      38.887 -41.074  -9.159  1.00 15.31      C    C  
+HETATM   32  C16 MTX A2000      40.070 -41.874  -9.001  1.00 21.54      C    C  
+HETATM   33  CT  MTX A2000      41.848 -47.565  -8.987  1.00 33.84      C    C  
+CONECT    1    2    3
+CONECT    2    1    7   33
+CONECT    3    1    4   27
+CONECT    4    3
+CONECT    5   15
+CONECT    6   18
+CONECT    7    2    8
+CONECT    8    7    9
+CONECT    9    8   10   11
+CONECT   10    9
+CONECT   11    9
+CONECT   12   26
+CONECT   13   15   23
+CONECT   14   33
+CONECT   15   13    5   17
+CONECT   16   33
+CONECT   17   15   18
+CONECT   18   17    6   19
+CONECT   19   18   20   23
+CONECT   20   19   21
+CONECT   21   20   22   25
+CONECT   22   21   24
+CONECT   23   13   19   24
+CONECT   24   22   23
+CONECT   25   21   26
+CONECT   26   25   12   30
+CONECT   27    3   28   32
+CONECT   28   27   29
+CONECT   29   28   30
+CONECT   30   26   29   31
+CONECT   31   30   32
+CONECT   32   27   31
+CONECT   33    2   14   16
+END

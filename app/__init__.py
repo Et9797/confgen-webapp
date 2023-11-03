@@ -3,11 +3,14 @@ from flask_mail import Mail, Message
 import logging
 from celery import Celery
 
+
 app = Flask(__name__)
+
+
 if app.config["ENV"] == "development":
     app.config.from_object("config.Config")
 else:
-    app.config.from_object("config.ConfigProduction")
+    app.config.from_object("config.ProductionConfig")
 
 # Email setup
 mail = Mail(app)
