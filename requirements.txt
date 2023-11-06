@@ -8,7 +8,6 @@ click==8.0.3
 click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.2.0
-Deprecated==1.2.13
 Flask==2.0.2
 Flask-Mail==0.9.1
 idna==3.3

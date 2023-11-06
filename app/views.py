@@ -18,7 +18,8 @@ def contact():
             sender = app.config["MAIL_USERNAME"],
             recipients = [app.config["MAIL_USERNAME"]]
         )
-        mail.send(msg)
+        with app.app_context():
+            mail.send(msg)
 
         return ('', 204)
 

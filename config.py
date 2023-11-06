@@ -1,4 +1,5 @@
 import os
+import _email
 
 
 class Config:
@@ -12,9 +13,8 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    MAIL_USERNAME = os.getenv("EMAIL")
-    MAIL_PASSWORD = os.getenv("EMAIL_PASS")
-    MAIL_DEFAULT_SENDER = os.getenv("EMAIL")
+    MAIL_USERNAME = _email.EMAIL
+    MAIL_PASSWORD = _email.EMAIL_PASS
     
     CELERY_BACKEND_URL = "redis://localhost:6379/0"
     CELERY_BROKER_URL = "redis://localhost:6379/0"

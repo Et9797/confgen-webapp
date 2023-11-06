@@ -2,3 +2,4 @@
 .venv/
 confgen.log
 confgen.wsgi
+_email.py
