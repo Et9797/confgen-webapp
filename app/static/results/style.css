@@ -1,190 +1,383 @@
-.main-container {
-    align-items: center;
-    height: 100vh;
+/* ========================================
+   Confgen Modern UI - Results Page Styles
+   ======================================== */
+
+/* ============ Glassmorphism ============ */
+.navbar-glass {
+  background: rgba(30, 41, 59, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-h1 {
-    font-size: 64px;
+.glass-card {
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
-#generating {
-  margin-bottom: 30px;
+/* ============ Molecule Loader Animation ============ */
+.molecule-loader {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
 }
 
-#generating::before {
-    content: ".";
-    animation: loading 4s linear infinite
-}
-
-#generating::after {
-    content: ".";
-    animation: loading 4s linear infinite
-}
-
-@keyframes loading {
-    20% {
-        content: ".."
-    }
-    40% {
-        content: "..."
-    }
-    60% {
-        content: "...."
-    }
-    80% {
-        content: "....."
-    }
-    100% {
-        content: "."
-    }
-}
-
-#finished {
-	  display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#download-reset-btns {
-    margin-top: 30px;
-    margin-right: 10px;
-}
-
-#error {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-#error a {
-    margin-top: 20px;
-}
-
-#error-message {
-	  white-space: pre-line;
-}
-
-.btn-success, .btn-warning {
-    font-size: 18px;
-    color:white;
-} 
-
-.btn:focus, .btn:active {
-    outline: none !important;
-    box-shadow: none !important;
-}
-
-.footer-bottom {
-    font-size: 9px;
-    align-self: center;
-    margin-top: auto;
-}
-
-svg {
-    scale: 1.5;
-}
-
-.checkmark__circle {
-  stroke-dasharray: 166;
-  stroke-dashoffset: 166;
-  stroke-width: 2;
-  stroke-miterlimit: 10;
-  stroke: #7ac142;
-  fill: none;
-  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-}
-
-.checkmark {
-  width: 56px;
-  height: 56px;
+.atom {
+  position: absolute;
   border-radius: 50%;
-  display: block;
-  stroke-width: 2;
-  stroke: #fff;
-  stroke-miterlimit: 10;
-  margin: 10% auto;
-  box-shadow: inset 0px 0px 0px #7ac142;
-  animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  animation: atomPulse 2s ease-in-out infinite;
 }
 
-.checkmark__check.animateElement {
-  transform-origin: 50% 50%;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+.atom-1 {
+  width: 30px;
+  height: 30px;
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.5);
+  animation-delay: 0s;
 }
 
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
-  }
+.atom-2 {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+  bottom: 15px;
+  left: 15px;
+  box-shadow: 0 0 20px rgba(20, 184, 166, 0.5);
+  animation-delay: 0.3s;
 }
-@keyframes scale {
+
+.atom-3 {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  bottom: 15px;
+  right: 15px;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  animation-delay: 0.6s;
+}
+
+.bond {
+  position: absolute;
+  height: 3px;
+  background: linear-gradient(90deg, rgba(6, 182, 212, 0.8), rgba(20, 184, 166, 0.8));
+  transform-origin: left center;
+  border-radius: 2px;
+}
+
+.bond-1 {
+  width: 50px;
+  top: 40px;
+  left: 35px;
+  transform: rotate(55deg);
+  animation: bondPulse 2s ease-in-out infinite;
+}
+
+.bond-2 {
+  width: 50px;
+  top: 40px;
+  right: 35px;
+  transform: rotate(-55deg);
+  transform-origin: right center;
+  animation: bondPulse 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes atomPulse {
   0%, 100% {
-    transform: none;
+    transform: translateX(-50%) scale(1);
+    opacity: 1;
   }
   50% {
-    transform: scale3d(1.1, 1.1, 1);
+    transform: translateX(-50%) scale(1.2);
+    opacity: 0.8;
   }
-}
-@keyframes fill {
-  100% {
-    box-shadow: inset 0px 0px 0px 30px #7ac142;
-  }
-  
 }
 
-.crossmark__circle.animateElement {
+.atom-2, .atom-3 {
+  animation-name: atomPulse2;
+}
+
+@keyframes atomPulse2 {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 0.8;
+  }
+}
+
+@keyframes bondPulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 0.4; }
+}
+
+/* Rotate entire molecule */
+.molecule-loader {
+  animation: moleculeRotate 8s linear infinite;
+}
+
+@keyframes moleculeRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ============ Loading Dots ============ */
+.loading-dots::after {
+  content: '';
+  animation: loadingDots 1.5s infinite;
+}
+
+@keyframes loadingDots {
+  0% { content: ''; }
+  25% { content: '.'; }
+  50% { content: '..'; }
+  75% { content: '...'; }
+  100% { content: ''; }
+}
+
+/* ============ Success Page Styles ============ */
+.success-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.success-icon {
+  display: inline-block;
+}
+
+/* Checkmark Animation */
+.checkmark {
+  width: 100px;
+  height: 100px;
+  display: block;
+  margin: 0 auto;
+}
+
+.checkmark-circle {
+  stroke: #22c55e;
+  stroke-width: 2;
   stroke-dasharray: 166;
   stroke-dashoffset: 166;
-  stroke-width: 2;
-  stroke-miterlimit: 10;
-  stroke: #ff0000;
-  fill: none;
-  animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
+  animation: checkmarkCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
 
-.crossmark.animateElement {
-  width: 56px;
-  height: 56px;
+.checkmark-check {
+  stroke: #22c55e;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: checkmarkCheck 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
+}
+
+@keyframes checkmarkCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes checkmarkCheck {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Success icon glow */
+.success-icon::after {
+  content: '';
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  background: radial-gradient(circle, rgba(34, 197, 94, 0.3) 0%, transparent 70%);
   border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation: successGlow 2s ease-in-out infinite;
+  z-index: -1;
+}
+
+@keyframes successGlow {
+  0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+}
+
+/* Download button pulse */
+.download-btn {
+  position: relative;
+}
+
+.download-btn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, #22c55e, #14b8a6);
+  border-radius: 14px;
+  z-index: -1;
+  opacity: 0;
+  animation: buttonPulse 2s ease-in-out infinite;
+}
+
+@keyframes buttonPulse {
+  0%, 100% { opacity: 0; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.02); }
+}
+
+/* ============ Failure Page Styles ============ */
+.error-container {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+.error-icon {
+  display: inline-block;
+  position: relative;
+}
+
+/* Crossmark Animation */
+.crossmark {
+  width: 100px;
+  height: 100px;
   display: block;
+  margin: 0 auto;
+}
+
+.crossmark-circle {
+  stroke: #ef4444;
   stroke-width: 2;
-  stroke: #ff0000;
-  stroke-miterlimit: 10;
-  margin: 10% auto;
-  box-shadow: inset 0px 0px 0px #ff0000;
-  animation: fillred .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: crossmarkCircle 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
 }
 
-.crossmark__check.animateElement {
-  transform-origin: 50% 50%;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
+.crossmark-x {
+  stroke: #ef4444;
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
 }
 
-.cross__path.animateElement {
-  stroke: #ffffff;
-  stroke-dasharray: 48;
-  stroke-dashoffset: 48;
-  transform-origin: 50% 50% 0;
-}
-.cross__path--right.animateElement {
-  animation: 0.3s ease 0.8s normal forwards 1 running stroke;
-}
-.cross__path--left.animateElement {
-  animation: 1s ease 0.8s normal forwards 1 running stroke;
+.crossmark-x-1 {
+  animation: crossmarkX 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.5s forwards;
 }
 
-@keyframes fillred {
-  100% {
-    box-shadow: inset 0px 0px 0px 30px #ff0000;
+.crossmark-x-2 {
+  animation: crossmarkX 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.65s forwards;
+}
+
+@keyframes crossmarkCircle {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes crossmarkX {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Error icon shake */
+.error-icon.shake {
+  animation: iconShake 0.5s ease-in-out;
+}
+
+@keyframes iconShake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-5px); }
+  40%, 80% { transform: translateX(5px); }
+}
+
+/* Error card glow */
+.error-card {
+  position: relative;
+}
+
+.error-card::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), transparent, rgba(239, 68, 68, 0.2));
+  border-radius: 1rem;
+  z-index: -1;
+  animation: errorGlow 3s ease-in-out infinite;
+}
+
+@keyframes errorGlow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* Error message formatting */
+.error-message {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+/* ============ General Animations ============ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-}
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s ease-out forwards;
+}
+
+.animate-fade-in-delay {
+  opacity: 0;
+  animation: fadeIn 0.6s ease-out 0.2s forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slideUp 0.6s ease-out 0.4s forwards;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============ Scrollbar ============ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(6, 182, 212, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(6, 182, 212, 0.5);
+}
+
+/* ============ Selection ============ */
+::selection {
+  background: rgba(6, 182, 212, 0.4);
+  color: white;
 }

@@ -1,169 +1,280 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title>Small molecule ligand conformer generation</title>
     <meta charset="utf-8">
     <meta name="description" content="Free small molecule ligand conformer generation with RDKit">
-    <meta name="viewport" content="user-scalable=no, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, minimal-ui">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              dark: { 900: '#0f172a', 800: '#1e293b', 700: '#334155' },
+              accent: { cyan: '#06b6d4', teal: '#14b8a6', green: '#10b981' }
+            }
+          }
+        }
+      }
+    </script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     {% block csslink %}
-      <link rel="stylesheet" href="{{ url_for('static', filename='home/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='home/style.css') }}">
     {% endblock %}
   </head>
-  <body>
-  {% block content %}
-    <!-- Modal How it works -->
-    <div class="modal fade" id="howItWorksModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">How it works</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close-hiw"></button>
-          </div>
-          <div class="modal-body">
-            <p>Small-molecule (ligand) conformer generation is usually performed prior to protein-ligand docking. 
-            RDKit [1] uses the ETKDG method to generate a collection of diverse low-energy conformers. Generation may 
-            take a while depending on how many conformers are being generated. Specifically intended for small-molecules, 
-            not proteins (look into molecular dynamics). Avoid ambiguities in the PDB file, primarily in the atom name 
-            column and the last atom column. Caution is warranted when providing ligands in PDB format, as the conversion is prone to 
-            errors, and may yield incorrectly assigned bond orders. It is advised to use SDF/Mol or preferably SMILES representation
-            for relatively larger molecules.
-            <p style="margin-top: 10px;">[1] <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank"> https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a></p>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Modal Contact -->
-    <div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Contact</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close-contact"></button>
-          </div>
-          <div class="modal-body">
-            <form id="contact-form" method="post" enctype="multipart/form-data">
-              <div class="form-group">
-                <label for="emailAddr" class="col-form-label">Your E-mail:</label>
-                <input type="text" class="form-control" name="email" id="emailAddr">
-              </div>
-              <div class="form-group">
-                <label for="message-text" class="col-form-label">Message:</label>
-                <textarea class="form-control" name="message" id="message-text" rows="10"></textarea>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <div class="alert alert-success p-2 m-auto" id="alertContact" role="alert" style="visibility: hidden;"> 
-              <i class="fas fa-check"></i> E-mail received.
-            </div>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary" id="sendBtnContact" form="contact-form">Send</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- Main content -->
-    <div class="container">
-      <div class="d-flex flex-column main-flex-container">
-        <!-- Nav-->
-        <nav class="navbar navbar-expand-lg navbar-light" style="background-color: #e3f2fd; margin-bottom: 10px;">
-          <a class="navbar-brand" href="/">Small Molecule Conformer Generation</a>
-          <button class="navbar-toggler btn" type="button" data-bs-toggle="collapse" data-bs-target="#main-nav" aria-controls="main-nav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
+  <body class="bg-gradient-to-br from-dark-900 via-dark-800 to-slate-900 h-screen text-white overflow-hidden">
+    <!-- Particle Canvas Background -->
+    <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
+
+    {% block content %}
+    <!-- How it Works Modal -->
+    <div id="howItWorksModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="modal-content bg-dark-800/90 backdrop-blur-xl border border-cyan-500/20 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl shadow-cyan-500/10 transform scale-95 opacity-0 transition-all duration-300">
+        <div class="p-6 border-b border-white/10 flex items-center justify-between">
+          <h3 class="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent flex items-center gap-2">
+            <i class="bi bi-info-circle text-cyan-400"></i> How it works
+          </h3>
+          <button onclick="closeModal('howItWorksModal')" class="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg">
+            <i class="bi bi-x-lg text-xl"></i>
           </button>
-          <div class="navbar-collapse collapse" id="main-nav">
-            <ul class="navbar-nav text-center">
-              <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#howItWorksModal" href="#howItWorksModal"><i class="fas fa-info-circle"></i> How it works</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" data-bs-toggle="modal" data-bs-target="#contactModal" href="#contactModal"><i class="fas fa-envelope"></i> Contact</a>
-              </li>
-              <li class="nav-item">
-                <a class="nav-link" href="https://github.com/et9797/confgen-webapp" target="_blank"><i class="fab fa-github"> Github</i></a>
-              </li>
-            </ul>
+        </div>
+        <div class="p-6 text-gray-300 leading-relaxed space-y-4">
+          <p>Small-molecule (ligand) conformer generation is usually performed prior to protein-ligand docking.
+          RDKit uses the <span class="text-cyan-400 font-medium">ETKDG method</span> to generate a collection of diverse low-energy conformers.</p>
+          <p>Generation may take a while depending on how many conformers are being generated. Specifically intended for small-molecules, not proteins (look into molecular dynamics).</p>
+          <div class="bg-amber-500/10 border border-amber-500/30 rounded-lg p-4 mt-4">
+            <p class="text-amber-300 text-sm"><i class="bi bi-exclamation-triangle mr-2"></i><strong>Note:</strong> Avoid ambiguities in PDB files. Caution is warranted when providing ligands in PDB format, as conversion is prone to errors. It is advised to use <span class="text-white font-medium">SDF/Mol</span> or preferably <span class="text-white font-medium">SMILES</span> representation for larger molecules.</p>
           </div>
-        </nav>
-        <!-- Video -->
-        <video muted loop autoplay id="conformersVideo">
-          <source src="{{ url_for('static', filename='home/conformers.mp4') }}" type="video/mp4">
-        </video>
-        <!-- Form -->
-        <form id="main-form" class="align-self-center" method="post" enctype="multipart/form-data" action="{{ url_for('form_handler') }}">
-          <div class="form-group row">
-            <label for="molInput" class="col col-form-label">Molecule file (pdb/sdf/mol) <b>/</b> Canonical SMILES:</label>
-            <div class="col align-self-center">
-              <input type="file" class="form-control" name="molFile" id="fileInput">
-            </div>
-            <div class="col-xl-1 h2 align-self-center text-center">/</div>
-            <div class="col-xl-5 align-self-center">
-              <input type="text" class="form-control" name="SMILES" id="smileInput" placeholder="SMILES">
-            </div>
+          <p class="text-sm text-gray-400 mt-4">
+            <i class="bi bi-journal-text mr-1"></i> Reference: <a href="https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654" target="_blank" class="text-cyan-400 hover:text-cyan-300 underline">https://pubs.acs.org/doi/10.1021/acs.jcim.5b00654</a>
+          </p>
+        </div>
+        <div class="p-4 border-t border-white/10 flex justify-end">
+          <button onclick="closeModal('howItWorksModal')" class="px-5 py-2 bg-dark-700 hover:bg-dark-900 rounded-lg transition-all duration-200">Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal-overlay fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+      <div class="modal-content bg-dark-800/90 backdrop-blur-xl border border-cyan-500/20 rounded-2xl max-w-md w-full shadow-2xl shadow-cyan-500/10 transform scale-95 opacity-0 transition-all duration-300">
+        <div class="p-6 border-b border-white/10 flex items-center justify-between">
+          <h3 class="text-xl font-semibold bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent flex items-center gap-2">
+            <i class="bi bi-envelope text-cyan-400"></i> Contact
+          </h3>
+          <button onclick="closeModal('contactModal')" class="text-gray-400 hover:text-white transition-colors p-1 hover:bg-white/10 rounded-lg">
+            <i class="bi bi-x-lg text-xl"></i>
+          </button>
+        </div>
+        <form id="contact-form" method="post" enctype="multipart/form-data" class="p-6 space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Your E-mail</label>
+            <input type="email" name="email" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all" placeholder="your@email.com">
           </div>
-          <div class="form-group row">
-            <label for="noConformers" class="col-xl-3 col-form-label">Number of conformers: </label>
-            <div class="col" style="max-width: 25%">
-              <input type="number" class="form-control" name="noConfs" id="noConformers" max=500 min=25 value=100 step=25>
-            </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+            <textarea name="message" rows="5" class="w-full bg-dark-900/50 border border-white/10 rounded-lg px-4 py-3 text-white placeholder-gray-500 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all resize-none" placeholder="Your message..."></textarea>
           </div>
-          <fieldset class="form-group">
-            <div class="row">
-              <legend class="col-xl-3 col-form-label">Output format:</legend>
-              <div class="col-xl-9 pt-2">
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="outputFormat" id="pdbRadio" value="pdb" checked>
-                  <label class="form-check-label" for="pdbRadio">pdb</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="outputFormat" id="sdfRadio" value="sdf">
-                  <label class="form-check-label" for="sdfRadio">sdf</label>
-                </div>
-                <div class="form-check">
-                  <input class="form-check-input" type="radio" name="outputFormat" id="molRadio" value="mol">
-                  <label class="form-check-label" for="molRadio">mol</label>
-                </div>
-              </div>
-            </div>
-          </fieldset>
-          <div class="form-group row">
-            <div class="col-xl-3 col-form-label">Conformers in separate files? </div>
-            <div class="col-xl-9 pt-2">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" name="separateFiles" id="separateFiles" checked>
-              </div>
-            </div>
-          </div>
-          <div class="form-group row">
-            <label for="emailAddress" class="col-xl-3 col-form-label">E-mail (optional):</label>
-            <div class="col">
-              <input type="email" class="form-control" name="emailAddress" id="emailAddress" placeholder="E-mail" style="max-width: 40%;">
-            </div>
-          </div>
-          <div class="row submitBtnContainer">
-            <button type="submit" class="btn btn-primary submitBtn" form="main-form">Submit</button>
+          <div id="alertContact" class="hidden bg-emerald-500/20 border border-emerald-500/50 text-emerald-400 px-4 py-2 rounded-lg text-sm">
+            <i class="bi bi-check-circle mr-2"></i> Message sent successfully!
           </div>
         </form>
-        <div class="invalid-feedback">
-          Provide a SMILES or correct file extension
+        <div class="p-4 border-t border-white/10 flex justify-end gap-3">
+          <button onclick="closeModal('contactModal')" class="px-5 py-2 bg-dark-700 hover:bg-dark-900 rounded-lg transition-all duration-200">Close</button>
+          <button type="submit" form="contact-form" id="sendBtnContact" class="px-5 py-2 bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 rounded-lg font-medium transition-all duration-200 hover:shadow-lg hover:shadow-cyan-500/25">
+            <i class="bi bi-send mr-2"></i>Send
+          </button>
         </div>
-        <!-- Footer -->
-        <footer class="footer-bottom">
-          Made with Flask & Bootstrap.
-        </footer>
       </div>
     </div>
-  {% endblock %}
-    <!-- JS-->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
+
+    <!-- Main Content -->
+    <div class="relative z-10 h-screen flex flex-col">
+      <!-- Navbar -->
+      <nav class="navbar-glass mx-4 mt-3 px-6 py-3 rounded-2xl flex items-center justify-between flex-shrink-0">
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
+            <i class="bi bi-bezier2 text-xl text-white"></i>
+          </div>
+          <div>
+            <span class="font-bold text-lg text-white">ConfGen</span>
+            <span class="hidden sm:inline text-gray-400 text-sm ml-2">with RDKit</span>
+          </div>
+        </a>
+        <div class="flex items-center gap-2 sm:gap-4">
+          <button onclick="openModal('howItWorksModal')" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+            <i class="bi bi-lightbulb"></i>
+            <span class="hidden sm:inline">How it works</span>
+          </button>
+          <a href="https://github.com/et9797/confgen-webapp" target="_blank" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+            <i class="bi bi-github"></i>
+            <span class="hidden sm:inline">GitHub</span>
+          </a>
+          <button onclick="openModal('contactModal')" class="nav-link px-3 py-2 rounded-lg text-gray-300 hover:text-white hover:bg-white/10 transition-all duration-200 flex items-center gap-2">
+            <i class="bi bi-envelope"></i>
+            <span class="hidden sm:inline">Contact</span>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Main Grid -->
+      <main class="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-auto">
+        <div class="w-full max-w-6xl grid lg:grid-cols-2 gap-6 items-center">
+          <!-- Hero Section -->
+          <div class="hidden lg:block text-center lg:text-left space-y-4">
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold">
+              <span class="bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 bg-clip-text text-transparent">Conformer</span>
+              <br>
+              <span class="text-white">Generation</span>
+            </h1>
+            <p class="text-gray-400 text-lg max-w-md mx-auto lg:mx-0">
+              Generate diverse low-energy 3D conformers for your small molecules using RDKit's ETKDG method.
+            </p>
+            <!-- Video Preview -->
+            <div class="video-container relative rounded-2xl overflow-hidden shadow-2xl shadow-cyan-500/20 border border-cyan-500/20 max-w-md mx-auto lg:mx-0">
+              <video muted loop autoplay playsinline class="w-full h-auto">
+                <source src="{{ url_for('static', filename='home/conformers.mp4') }}" type="video/mp4">
+              </video>
+              <div class="absolute inset-0 pointer-events-none border-2 border-transparent bg-gradient-to-br from-cyan-500/20 via-transparent to-teal-500/20 rounded-2xl"></div>
+            </div>
+          </div>
+
+          <!-- Form Card -->
+          <div class="glass-card p-5 sm:p-6 rounded-2xl lg:max-h-[calc(100vh-120px)] overflow-y-auto">
+            <form id="main-form" method="post" enctype="multipart/form-data" action="{{ url_for('form_handler') }}" class="space-y-4">
+
+              <!-- File Upload Zone -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-3">
+                  <i class="bi bi-file-earmark-arrow-up mr-2 text-cyan-400"></i>Molecule File
+                </label>
+                <div id="dropZone" class="drop-zone border-2 border-dashed border-white/20 rounded-xl p-5 text-center cursor-pointer hover:border-cyan-500/50 hover:bg-cyan-500/5 transition-all duration-300">
+                  <input type="file" name="molFile" id="fileInput" class="hidden" accept=".pdb,.sdf,.mol">
+                  <div id="dropZoneContent">
+                    <i class="bi bi-cloud-arrow-up text-3xl text-cyan-400 mb-2 block"></i>
+                    <p class="text-gray-300 font-medium text-sm">Drop your file here or click to browse</p>
+                    <p class="text-gray-600 text-xs mt-1">Supports: PDB, SDF, MOL</p>
+                  </div>
+                  <div id="fileSelected" class="hidden">
+                    <i class="bi bi-file-earmark-check text-3xl text-emerald-400 mb-2 block"></i>
+                    <p class="text-emerald-400 font-medium" id="fileName">file.pdb</p>
+                    <button type="button" id="removeFile" class="text-gray-500 hover:text-red-400 text-sm mt-2 transition-colors">
+                      <i class="bi bi-x-circle mr-1"></i>Remove
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- OR Divider -->
+              <div class="flex items-center gap-4">
+                <div class="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+                <span class="text-gray-500 text-sm font-medium">OR</span>
+                <div class="flex-1 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+              </div>
+
+              <!-- SMILES Input -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-3">
+                  <i class="bi bi-code-slash mr-2 text-cyan-400"></i>SMILES String
+                </label>
+                <input type="text" name="SMILES" id="smileInput" placeholder="e.g., CC(=O)OC1=CC=CC=C1C(=O)O" class="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all font-mono text-sm">
+              </div>
+
+              <!-- Options Grid -->
+              <div class="grid sm:grid-cols-2 gap-4">
+                <!-- Number of Conformers -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-3">
+                    <i class="bi bi-stack mr-2 text-cyan-400"></i>Conformers
+                  </label>
+                  <div class="flex items-center gap-2">
+                    <button type="button" id="decreaseConf" class="w-10 h-10 rounded-lg bg-dark-900/50 border border-white/10 text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all flex items-center justify-center">
+                      <i class="bi bi-dash-lg"></i>
+                    </button>
+                    <input type="number" name="noConfs" id="noConformers" max="500" min="25" value="100" step="25" class="flex-1 bg-dark-900/50 border border-white/10 rounded-lg px-4 py-2 text-white text-center focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all">
+                    <button type="button" id="increaseConf" class="w-10 h-10 rounded-lg bg-dark-900/50 border border-white/10 text-gray-400 hover:text-white hover:border-cyan-500/50 transition-all flex items-center justify-center">
+                      <i class="bi bi-plus-lg"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Output Format -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-300 mb-3">
+                    <i class="bi bi-file-earmark-code mr-2 text-cyan-400"></i>Output Format
+                  </label>
+                  <div class="flex gap-2">
+                    <label class="format-pill flex-1">
+                      <input type="radio" name="outputFormat" id="pdbRadio" value="pdb" class="hidden" checked>
+                      <span class="block text-center py-2 px-3 rounded-lg border border-white/10 cursor-pointer transition-all hover:border-cyan-500/50">PDB</span>
+                    </label>
+                    <label class="format-pill flex-1">
+                      <input type="radio" name="outputFormat" id="sdfRadio" value="sdf" class="hidden">
+                      <span class="block text-center py-2 px-3 rounded-lg border border-white/10 cursor-pointer transition-all hover:border-cyan-500/50">SDF</span>
+                    </label>
+                    <label class="format-pill flex-1">
+                      <input type="radio" name="outputFormat" id="molRadio" value="mol" class="hidden">
+                      <span class="block text-center py-2 px-3 rounded-lg border border-white/10 cursor-pointer transition-all hover:border-cyan-500/50">MOL</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Separate Files Toggle -->
+              <div class="flex items-center justify-between bg-dark-900/30 rounded-xl px-4 py-3">
+                <div>
+                  <label class="text-sm font-medium text-gray-300">Separate files</label>
+                  <p class="text-xs text-gray-500">Output each conformer as individual file</p>
+                </div>
+                <label class="toggle-switch">
+                  <input type="checkbox" name="separateFiles" id="separateFiles" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+              </div>
+
+              <!-- Email -->
+              <div>
+                <label class="block text-sm font-medium text-gray-300 mb-3">
+                  <i class="bi bi-envelope mr-2 text-cyan-400"></i>Email <span class="text-gray-600">(optional)</span>
+                </label>
+                <input type="email" name="emailAddress" id="emailAddress" placeholder="Get notified when complete" class="w-full bg-dark-900/50 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-gray-600 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition-all">
+              </div>
+
+              <!-- Error Message -->
+              <div id="errorFeedback" class="hidden bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-xl text-sm">
+                <i class="bi bi-exclamation-circle mr-2"></i>Please provide a SMILES string or upload a valid file (PDB, SDF, or MOL)
+              </div>
+
+              <!-- Submit Button -->
+              <button type="submit" id="submitBtn" class="submit-btn w-full py-3 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5 flex items-center justify-center gap-2">
+                <span id="submitText">Generate Conformers</span>
+                <i class="bi bi-arrow-right"></i>
+                <span id="submitSpinner" class="hidden">
+                  <svg class="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                </span>
+              </button>
+            </form>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer -->
+      <footer class="text-center py-2 text-gray-600 text-xs flex-shrink-0">
+        Made with <i class="bi bi-heart-fill text-red-500/50"></i> using Flask & Tailwind
+      </footer>
+    </div>
+    {% endblock %}
+
+    <!-- JS -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-  {% block js %}
+    {% block js %}
     <script src="{{ url_for('static', filename='home/main.js') }}"></script>
-  {% endblock %}
+    {% endblock %}
   </body>
 </html>

@@ -3,3 +3,7 @@
 confgen.log
 confgen.wsgi
 _email.py
+.claude/
+apache-example.conf
+logs/
+pids/

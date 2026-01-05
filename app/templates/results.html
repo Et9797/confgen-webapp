@@ -5,19 +5,59 @@
 {% endblock %}
 
 {% block content %}
-<div class="container">
-  <div class="d-flex flex-column main-container">
-    {% block success %}{% endblock %}
-    {% block failure %}{% endblock %}
-    {% block generating %}
-    <h1 id="generating">Generating</h1> <br>
-    <h6 id="notification">Your job will finish shortly. An e-mail will be sent upon completion
-       if provided (check the junk folder).</h6>
-    {% endblock %}
-    <footer class="footer-bottom">
-      Made with Flask & Bootstrap.
-    </footer>
-  </div>
+<div class="relative z-10 min-h-screen flex flex-col">
+  <!-- Simplified Navbar -->
+  <nav class="navbar-glass mx-4 mt-4 px-6 py-4 rounded-2xl flex items-center justify-center">
+    <a href="/" class="flex items-center gap-3 group">
+      <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
+        <i class="bi bi-bezier2 text-xl text-white"></i>
+      </div>
+      <div>
+        <span class="font-bold text-lg text-white">ConfGen</span>
+        <span class="hidden sm:inline text-gray-400 text-sm ml-2">with RDKit</span>
+      </div>
+    </a>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="flex-1 flex items-center justify-center p-8">
+    <div class="text-center">
+      {% block success %}{% endblock %}
+      {% block failure %}{% endblock %}
+      {% block generating %}
+      <!-- Molecule Loader Animation -->
+      <div class="molecule-loader mb-8">
+        <div class="atom atom-1"></div>
+        <div class="atom atom-2"></div>
+        <div class="atom atom-3"></div>
+        <div class="bond bond-1"></div>
+        <div class="bond bond-2"></div>
+      </div>
+
+      <h1 class="text-4xl sm:text-5xl font-bold mb-4">
+        <span class="bg-gradient-to-r from-cyan-400 to-teal-400 bg-clip-text text-transparent">Generating</span>
+        <span class="loading-dots"></span>
+      </h1>
+
+      <p class="text-gray-400 text-lg max-w-md mx-auto mb-8">
+        Your conformers are being generated. This may take a moment depending on molecule complexity.
+      </p>
+
+      <div class="glass-card inline-block px-6 py-4 rounded-xl">
+        <p class="text-gray-300 text-sm flex items-center gap-2">
+          <i class="bi bi-envelope text-cyan-400"></i>
+          An email will be sent upon completion if provided
+        </p>
+        <p class="text-gray-500 text-xs mt-1">(check your spam folder)</p>
+      </div>
+      {% endblock %}
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 text-gray-600 text-sm">
+    Made with <i class="bi bi-heart-fill text-red-500/50"></i> using Flask & Tailwind
+  </footer>
 </div>
 {% endblock %}
 

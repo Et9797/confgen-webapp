@@ -1,18 +1,37 @@
 {% extends "results.html" %}
 
 {% block success %}
-<div id="finished">
-  <h1>Finished
-    <svg class="checkmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-      <circle class="checkmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
-      <path class="checkmark__check addClass" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
+<!-- Confetti Canvas -->
+<canvas id="confettiCanvas" class="fixed inset-0 pointer-events-none z-50"></canvas>
+
+<!-- Success Content -->
+<div class="success-container">
+  <!-- Animated Checkmark -->
+  <div class="success-icon mb-6">
+    <svg class="checkmark" viewBox="0 0 52 52">
+      <circle class="checkmark-circle" cx="26" cy="26" r="25" fill="none"/>
+      <path class="checkmark-check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
     </svg>
+  </div>
+
+  <h1 class="text-4xl sm:text-5xl font-bold mb-4 animate-fade-in">
+    <span class="bg-gradient-to-r from-emerald-400 to-teal-400 bg-clip-text text-transparent">Success!</span>
   </h1>
-  <div id="download-reset-btns">
-    <a href="{{ url_for('serve_files', task_id=task_id) }}" id="downloadBtn"><button class="btn btn-success"
-        type="button">Download</button></a>
-    <a href="{{ url_for('index') }}"><button class="btn btn-warning" type="button"
-        style="color:white;">Reset</button></a>
+
+  <p class="text-gray-400 text-lg mb-8 animate-fade-in-delay">
+    Your conformers have been generated successfully.
+  </p>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up">
+    <a href="{{ url_for('serve_files', task_id=task_id) }}" class="download-btn group px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 transition-all duration-300 hover:shadow-lg hover:shadow-emerald-500/30 hover:-translate-y-0.5 flex items-center justify-center gap-3">
+      <i class="bi bi-download text-xl group-hover:animate-bounce"></i>
+      Download Results
+    </a>
+    <a href="{{ url_for('index') }}" class="px-8 py-4 rounded-xl font-semibold text-gray-300 bg-dark-700/50 border border-white/10 hover:bg-dark-700 hover:border-cyan-500/30 transition-all duration-300 flex items-center justify-center gap-3">
+      <i class="bi bi-arrow-repeat"></i>
+      Generate More
+    </a>
   </div>
 </div>
 {% endblock %}
@@ -21,6 +40,86 @@
 
 {% block js %}
 <script>
-  $(".addClass").toggleClass("animateElement")
+// Confetti Animation
+class Confetti {
+  constructor(canvas) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.particles = [];
+    this.colors = ['#06b6d4', '#14b8a6', '#10b981', '#22c55e', '#34d399', '#5eead4'];
+
+    this.resize();
+    this.createParticles();
+    this.animate();
+
+    window.addEventListener('resize', () => this.resize());
+  }
+
+  resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+  }
+
+  createParticles() {
+    for (let i = 0; i < 150; i++) {
+      this.particles.push({
+        x: Math.random() * this.canvas.width,
+        y: -20 - Math.random() * 100,
+        vx: (Math.random() - 0.5) * 4,
+        vy: Math.random() * 3 + 2,
+        size: Math.random() * 8 + 4,
+        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+        rotation: Math.random() * 360,
+        rotationSpeed: (Math.random() - 0.5) * 10,
+        shape: Math.random() > 0.5 ? 'rect' : 'circle'
+      });
+    }
+  }
+
+  animate() {
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+    let activeParticles = 0;
+
+    this.particles.forEach(p => {
+      if (p.y < this.canvas.height + 20) {
+        activeParticles++;
+
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.1; // gravity
+        p.rotation += p.rotationSpeed;
+
+        this.ctx.save();
+        this.ctx.translate(p.x, p.y);
+        this.ctx.rotate(p.rotation * Math.PI / 180);
+        this.ctx.fillStyle = p.color;
+        this.ctx.globalAlpha = Math.max(0, 1 - p.y / this.canvas.height);
+
+        if (p.shape === 'rect') {
+          this.ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size / 2);
+        } else {
+          this.ctx.beginPath();
+          this.ctx.arc(0, 0, p.size / 2, 0, Math.PI * 2);
+          this.ctx.fill();
+        }
+
+        this.ctx.restore();
+      }
+    });
+
+    if (activeParticles > 0) {
+      requestAnimationFrame(() => this.animate());
+    }
+  }
+}
+
+// Initialize confetti
+document.addEventListener('DOMContentLoaded', () => {
+  const canvas = document.getElementById('confettiCanvas');
+  if (canvas) {
+    new Confetti(canvas);
+  }
+});
 </script>
 {% endblock %}

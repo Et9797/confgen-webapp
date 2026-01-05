@@ -1,18 +1,69 @@
 {% extends "results.html" %}
 
 {% block failure %}
-<div id="error">
-  <h1>Something went wrong
-    <svg class="crossmark addClass" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-      <circle class="crossmark__circle addClass" cx="26" cy="26" r="25" fill="none" />
-      <path class="cross__path cross__path--right addClass" fill="none" d="M16,16 l20,20" />
-      <path class="cross__path cross__path--left addClass" fill="none" d="M16,36 l20,-20" />
+<!-- Error Content -->
+<div class="error-container">
+  <!-- Animated X Mark -->
+  <div class="error-icon mb-6">
+    <svg class="crossmark" viewBox="0 0 52 52">
+      <circle class="crossmark-circle" cx="26" cy="26" r="25" fill="none"/>
+      <path class="crossmark-x crossmark-x-1" fill="none" d="M16 16 L36 36"/>
+      <path class="crossmark-x crossmark-x-2" fill="none" d="M36 16 L16 36"/>
     </svg>
+  </div>
+
+  <h1 class="text-4xl sm:text-5xl font-bold mb-4 animate-fade-in">
+    <span class="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">Something went wrong</span>
   </h1>
-  <p>An error occurred during generation. Check if the provided file or SMILES string is correct. Error log:</p>
-  <div class="alert alert-danger" id="error-message"> {{ error_message }} </div>
-  <a href="{{ url_for('index') }}"><button class="btn btn-warning resetBtn" type="button"
-      style="color:white;">Reset</button></a>
+
+  <p class="text-gray-400 text-lg mb-6 animate-fade-in-delay max-w-md mx-auto">
+    An error occurred during conformer generation. Please verify your input.
+  </p>
+
+  <!-- Error Details Card -->
+  <div class="error-card glass-card p-6 rounded-2xl max-w-2xl mx-auto mb-8 text-left animate-slide-up border border-red-500/20">
+    <div class="flex items-start gap-4">
+      <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
+        <i class="bi bi-exclamation-triangle text-red-400 text-xl"></i>
+      </div>
+      <div class="flex-1 min-w-0">
+        <h3 class="text-red-400 font-semibold mb-2">Error Details</h3>
+        <div class="error-message text-gray-300 text-sm font-mono bg-dark-900/50 rounded-lg p-4 overflow-x-auto">{{ error_message }}</div>
+      </div>
+    </div>
+
+    <!-- Troubleshooting Tips -->
+    <div class="mt-6 pt-6 border-t border-white/10">
+      <h4 class="text-gray-300 font-medium mb-3 flex items-center gap-2">
+        <i class="bi bi-lightbulb text-amber-400"></i>
+        Troubleshooting Tips
+      </h4>
+      <ul class="text-gray-400 text-sm space-y-2">
+        <li class="flex items-start gap-2">
+          <i class="bi bi-check2 text-cyan-400 mt-0.5"></i>
+          <span>Verify your SMILES string is valid and represents a valid molecule</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i class="bi bi-check2 text-cyan-400 mt-0.5"></i>
+          <span>Check that your file is in correct PDB, SDF, or MOL format</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i class="bi bi-check2 text-cyan-400 mt-0.5"></i>
+          <span>For PDB files, ensure atom names and bond orders are unambiguous</span>
+        </li>
+        <li class="flex items-start gap-2">
+          <i class="bi bi-check2 text-cyan-400 mt-0.5"></i>
+          <span>Consider using SDF/MOL or SMILES format for better compatibility</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Action Button -->
+  <a href="{{ url_for('index') }}" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5 animate-slide-up">
+    <i class="bi bi-arrow-left"></i>
+    Try Again
+  </a>
 </div>
 {% endblock %}
 
@@ -20,6 +71,15 @@
 
 {% block js %}
 <script>
-  $(".addClass").toggleClass("animateElement")
+// Trigger animations on load
+document.addEventListener('DOMContentLoaded', () => {
+  // Add slight shake to error icon
+  const errorIcon = document.querySelector('.error-icon');
+  if (errorIcon) {
+    setTimeout(() => {
+      errorIcon.classList.add('shake');
+    }, 800);
+  }
+});
 </script>
 {% endblock %}
