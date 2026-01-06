@@ -25,7 +25,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='home/style.css') }}">
     {% endblock %}
   </head>
-  <body class="bg-gradient-to-br from-dark-900 via-dark-800 to-slate-900 h-screen text-white overflow-hidden">
+  <body class="bg-gradient-to-br from-dark-900 via-dark-800 to-slate-900 min-h-screen text-white overflow-x-hidden">
     <!-- Particle Canvas Background -->
     <canvas id="particleCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
@@ -92,9 +92,9 @@
     </div>
 
     <!-- Main Content -->
-    <div class="relative z-10 h-screen flex flex-col">
-      <!-- Navbar -->
-      <nav class="navbar-glass mx-4 mt-3 px-6 py-3 rounded-2xl flex items-center justify-between flex-shrink-0">
+    <div class="relative z-10 min-h-screen flex flex-col pt-20 sm:pt-24">
+      <!-- Navbar (Fixed) -->
+      <nav class="navbar-glass fixed top-0 left-0 right-0 mx-4 mt-3 px-6 py-3 rounded-2xl flex items-center justify-between z-30">
         <a href="/" class="flex items-center gap-3 group">
           <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30 group-hover:shadow-cyan-500/50 transition-all duration-300">
             <i class="bi bi-bezier2 text-xl text-white"></i>
@@ -121,8 +121,8 @@
       </nav>
 
       <!-- Main Grid -->
-      <main class="flex-1 flex items-center justify-center p-4 sm:p-6 overflow-auto">
-        <div class="w-full max-w-6xl grid lg:grid-cols-2 gap-6 items-center">
+      <main class="flex-1 flex items-start lg:items-center justify-center p-4 sm:p-6">
+        <div class="w-full max-w-6xl grid lg:grid-cols-2 gap-6 items-start lg:items-center">
           <!-- Hero Section -->
           <div class="hidden lg:block text-center lg:text-left space-y-4">
             <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold">

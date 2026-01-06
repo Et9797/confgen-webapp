@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block content %}
-<div class="relative z-10 min-h-screen flex flex-col">
-  <!-- Simplified Navbar -->
-  <nav class="navbar-glass mx-4 mt-4 px-6 py-4 rounded-2xl flex items-center justify-center">
+<div class="relative z-10 min-h-screen flex flex-col pt-20 sm:pt-24">
+  <!-- Simplified Navbar (Fixed) -->
+  <nav class="navbar-glass fixed top-0 left-0 right-0 mx-4 mt-3 px-6 py-3 rounded-2xl flex items-center justify-center z-30">
     <a href="/" class="flex items-center gap-3 group">
       <div class="w-10 h-10 bg-gradient-to-br from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center shadow-lg shadow-cyan-500/30">
         <i class="bi bi-bezier2 text-xl text-white"></i>
@@ -20,8 +20,8 @@
   </nav>
 
   <!-- Main Content -->
-  <main class="flex-1 flex items-center justify-center p-8">
-    <div class="text-center">
+  <main class="flex-1 flex items-center justify-center p-4 sm:p-8">
+    <div class="text-center w-full px-2">
       {% block success %}{% endblock %}
       {% block failure %}{% endblock %}
       {% block generating %}

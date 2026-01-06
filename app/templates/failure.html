@@ -4,7 +4,7 @@
 <!-- Error Content -->
 <div class="error-container">
   <!-- Animated X Mark -->
-  <div class="error-icon mb-6">
+  <div class="error-icon mb-4 sm:mb-6">
     <svg class="crossmark" viewBox="0 0 52 52">
       <circle class="crossmark-circle" cx="26" cy="26" r="25" fill="none"/>
       <path class="crossmark-x crossmark-x-1" fill="none" d="M16 16 L36 36"/>
@@ -12,16 +12,16 @@
     </svg>
   </div>
 
-  <h1 class="text-4xl sm:text-5xl font-bold mb-4 animate-fade-in">
+  <h1 class="text-2xl sm:text-4xl font-bold mb-3 sm:mb-4 animate-fade-in">
     <span class="bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">Something went wrong</span>
   </h1>
 
-  <p class="text-gray-400 text-lg mb-6 animate-fade-in-delay max-w-md mx-auto">
+  <p class="text-gray-400 text-base sm:text-lg mb-4 sm:mb-6 animate-fade-in-delay max-w-md mx-auto px-2">
     An error occurred during conformer generation. Please verify your input.
   </p>
 
   <!-- Error Details Card -->
-  <div class="error-card glass-card p-6 rounded-2xl max-w-2xl mx-auto mb-8 text-left animate-slide-up border border-red-500/20">
+  <div class="error-card glass-card p-4 sm:p-6 rounded-2xl max-w-2xl mx-auto mb-6 sm:mb-8 text-left animate-slide-up border border-red-500/20">
     <div class="flex items-start gap-4">
       <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center">
         <i class="bi bi-exclamation-triangle text-red-400 text-xl"></i>
@@ -60,7 +60,7 @@
   </div>
 
   <!-- Action Button -->
-  <a href="{{ url_for('index') }}" class="inline-flex items-center gap-3 px-8 py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5 animate-slide-up">
+  <a href="{{ url_for('index') }}" class="inline-flex items-center gap-2 sm:gap-3 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-semibold text-white bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 transition-all duration-300 hover:shadow-lg hover:shadow-cyan-500/30 hover:-translate-y-0.5 animate-slide-up">
     <i class="bi bi-arrow-left"></i>
     Try Again
   </a>

@@ -42,18 +42,18 @@ def generate_confs(
         if exception_occurred:
             app.logger.warn(sio.getvalue())
         
-        # Send mail to user if one was provided
-        if mail_address:
+        # Send mail to user if one was provided and mail is configured
+        if mail_address and app.config.get("MAIL_USERNAME"):
             msg = Message(
-                subject = "Conformer generation job completed.", 
+                subject = "Conformer generation job completed.",
                 body = (
                     "Your job has been completed. URL for the results page:\n"
                     f"http://confgen.net/results/{task_id}"
                 ),
-                sender = app.config["MAIL_USERNAME"], 
+                sender = app.config["MAIL_USERNAME"],
                 recipients = [mail_address]
-            )   
+            )
             try:
                 mail.send(msg)
-            except SMTPRecipientsRefused: 
-                pass # Recipient email address may not be valid -> ignore
+            except (SMTPRecipientsRefused, Exception):
+                pass  # Email not configured or recipient invalid -> ignore
